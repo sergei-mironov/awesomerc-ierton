@@ -527,6 +527,10 @@ awful.hooks.manage.register(function (c)
 
     -- Set key bindings
     c:keys(clientkeys)
+
+	if not c.icon and theme.default_client_icon then
+		c.icon = image(theme.default_client_icon)
+	end
 end)
 
 -- Hook function to execute when arranging the screen.

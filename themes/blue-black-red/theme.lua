@@ -99,6 +99,7 @@ theme.awesome_icon = theme.config .. "/icons/im-aim.png"
 -- look inside /usr/share/icons/, default: nil (don't use icon theme)
 theme.icon_theme = "Tango"
 theme.icon_theme_size = "32x32"
+theme.default_client_icon = theme.config .. "/icons/emptytrash.png"
 
 return theme
 
