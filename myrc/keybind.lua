@@ -22,19 +22,22 @@ module("myrc.keybind")
 
 local notify_keychain = nil
 
+-- Will inser keys from mytable to the end of globalkeys
+-- one has to call pop() with same mytable
 function push(mytable,ftitle)
-	local globalkeys = capi.root.keys()
 	local description = ""
+	local newkeys = {}
     for _, k in ipairs(mytable) do
-        table.insert(globalkeys,k)
+		newkeys = awful.util.table.join(newkeys, k.keys)
 		description = description .. "\n"
-		if k.release == nil then
-			description = description .. "BUG! use myrc.keybind.key() for key " .. tostring(k.keysym)
-		else
-			description = description ..  tostring(k.keysym) .. ": " ..  ( k.release("describe!") or "<no_description>" )
-		end
+		description = description ..  tostring(k.keysym) .. ": " ..  ( k.desc or "<no_description>" )
     end
+
+	local globalkeys = awful.util.table.join(
+		capi.root.keys(), newkeys)
+
 	capi.root.keys(globalkeys)
+
     if not notify_keychain then
         notify_keychain = naughty.notify({
             title = ftitle,
@@ -45,34 +48,33 @@ function push(mytable,ftitle)
     end
 end
 
+-- removes #mytable items from the end of globalkeys
+-- FIXME: add some fool-protection, man..
 function pop(mytable)
-	local globalkeys = capi.root.keys()
-    for k, v in ipairs(mytable) do
-        table.remove(globalkeys)
-        capi.root.keys(globalkeys)
+	local newkeys = {}
+    for _, k in ipairs(mytable) do
+		newkeys = awful.util.table.join(newkeys, k.keys)
     end
+
+	local globalkeys = capi.root.keys()
+    for k, v in ipairs(newkeys) do
+        table.remove(globalkeys)
+    end
+
+	capi.root.keys(globalkeys)
+
     if notify_keychain then
         naughty.destroy(notify_keychain)
         notify_keychain = nil
     end
 end
 
-function key(a1,a2,d,a3,a4)
-	local k = capi.key(a1,a2,a3,function(var)
-		if var == nil then 
-			a4()
-		else
-			return tostring(d)
-		end
-	end)
+function key(mod, key, desc, press)
+	local k = {
+		keys = awful.key(mod, key, press),
+		desc = tostring(desc),
+		keysym = tostring(key),
+	}
 	return k
-end
-
-function describe(t)
-
-	for _, k in ipairs(t) do
-		dbg({ k.keysym , k.press("describe!") })
-	end
-
 end
 

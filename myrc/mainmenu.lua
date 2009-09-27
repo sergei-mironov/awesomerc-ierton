@@ -64,8 +64,7 @@ function build()
 	for _, item in ipairs(freedesktop_menu.new()) do table.insert(mymainmenu_items, item) end
 	for _, item in ipairs(mymainmenu_items_tail) do table.insert(mymainmenu_items, item) end
 
-	return awful.menu.new({ items = mymainmenu_items, 
-		keys = {up='k', down = 'j', back = 'h', exec = 'l'}})
+	return awful.menu({ items = mymainmenu_items })
 end
 
 

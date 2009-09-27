@@ -55,7 +55,7 @@ function move(tag, where, s)
 	local oldkey = awful.util.table.hasitem(stags,tag)
 	if oldkey == nil then return end
 	if type(where) == "number" then
-		local index = awful.util.cycle(#stags, where+1)
+		local index = awful.util.cycle(#stags, where)
 		table.remove(stags,oldkey)
 		table.insert(stags,index,tag)
 	else --tag object
@@ -72,7 +72,8 @@ function add(tn, props, s)
 	local props = props or {}
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local tn = tostring(tn)
-	local t = capi.tag(tn)
+	--local t = capi.tag(tn)
+	local t = capi.tag {name = tn}
 	t.screen = s
 	awful.layout.set(props.layout or awful.layout.suit.max, t)
 	tags[s][tn] = t
