@@ -31,15 +31,15 @@ function client_name(c)
 	return cls..":"..inst..":"..role
 end
 
-function get_floating(c)
-	return myrc.memory.get("floating", client_name(c), 
-		awful.client.floating.get(c))
-end
-
 function save_floating(c, f)
 	myrc.memory.set("floating", client_name(c), f)
 	awful.client.floating.set(c, f)
 	return f
+end
+
+function get_floating(c, def)
+	if def == nil then def = awful.client.floating.get(c) end
+	return myrc.memory.get("floating", client_name(c), def)
 end
 
 function save_centered(c, val)
@@ -50,8 +50,8 @@ function save_centered(c, val)
 	return val
 end
 
-function get_centered(c)
-	return myrc.memory.get("centered", client_name(c), nil)
+function get_centered(c, def)
+	return myrc.memory.get("centered", client_name(c), def)
 end
 
 function save_titlebar(c, val)
@@ -64,8 +64,8 @@ function save_titlebar(c, val)
 	return val
 end
 
-function get_titlebar(c)
-	return myrc.memory.get("titlebar", client_name(c), nil)
+function get_titlebar(c, def)
+	return myrc.memory.get("titlebar", client_name(c), def)
 end
 
 function save_geometry(c, val)
@@ -74,8 +74,8 @@ function save_geometry(c, val)
 	c:geometry(val)
 end
 
-function get_geometry(c)
-	return myrc.memory.get("geometry", client_name(c), nil)
+function get_geometry(c, def)
+	return myrc.memory.get("geometry", client_name(c), def)
 end
 
 
@@ -87,31 +87,34 @@ function build_client_menu(c)
 	local titlebar = get_titlebar(c)
 	local geometry = get_geometry(c)
 	function checkbox(name, val) 
-		if val==true then return "[on] "..name 
-		elseif val==false then return "[off] " .. name 
-		else return "[auto] " .. name 
+		if val==true then return "[X] "..name 
+		elseif val==false then return "[ ] " .. name 
+		else return "[?] " .. name 
 		end 
+	end
+	function bool_submenu(f) 
+		return {
+			{"Set", function () f(true) end },
+			{"UnSet", function() f(false) end },
+		}
 	end
 	mycontextmenu = awful.menu.new( { 
 		items = { 
 			{ "Close", function() c:kill() 
 				end, freedesktop.utils.lookup_icon({ icon = 'gtk-stop' })} ,
-			{ checkbox("Floating",floating), function() 
-				save_floating(c, ( not floating ) or true) 
-				end, beautiful.tasklist_floating_icon  },
-			{ checkbox("Centered", centered), function() 
-				save_centered(c, ( not centered ) or true) 
-				end,   },
-			{ checkbox("Titlebar", titlebar), function() 
-				save_titlebar(c, ( not titlebar ) or true) 
-				end,   },
-			{ checkbox("Geomtery", geometry ~= nil ), function() 
+			{ checkbox("Floating",floating), 
+				bool_submenu(function(v) save_floating(c, v) end) },
+			{ checkbox("Centered", centered),
+				bool_submenu(function(v) save_centered(c, v) end) },
+			{ checkbox("Titlebar", titlebar),
+				bool_submenu(function(v) save_titlebar(c, v) end) },
+			{ checkbox("Store geomtery", geometry ~= nil ), function() 
 				save_geometry(c, c:geometry() ) 
-				end,   },
-			{ "Maximize", function () 
+				end, },
+			{ "Toggle maximize", function () 
 				c.maximized_horizontal = not c.maximized_horizontal
 				c.maximized_vertical   = not c.maximized_vertical
-				end, beautiful.layout_max  }
+				end, }
 		}, 
 		height = beautiful.menu_context_height 
 	} )
