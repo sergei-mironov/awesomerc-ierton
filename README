@@ -1,3 +1,14 @@
 Hope, you find my work usefull.
-Mail bugs to ierton@gmail.com
+
+Here is some default bindings:
+
+Crtl+modkey+s - tag manipulation submenu (rename, add, del, etc)
+
+altkey+F1 - jump to one tag left
+altkey+F2 - jump to one tag right
+
+modkey+F1 - move current clinet one tag left
+modkey+F2 - move current clinet one tag right
+
+Mail bugs to ierton@gmail.com.
 Sergey.
