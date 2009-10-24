@@ -22,11 +22,10 @@ module("myrc.keybind")
 
 local notify_keychain = nil
 
--- Will inser keys from mytable to the end of globalkeys
--- one has to call pop() with same mytable
-function push(mytable,ftitle)
+local newkeys = nil
+
+function push_(mytable,ftitle, setter, getter)
 	local description = ""
-	local newkeys = {}
     for _, k in ipairs(mytable) do
 		newkeys = awful.util.table.join(newkeys, k.keys)
 		description = description .. "\n"
@@ -34,9 +33,9 @@ function push(mytable,ftitle)
     end
 
 	local globalkeys = awful.util.table.join(
-		capi.root.keys(), newkeys)
+		getter(), newkeys)
 
-	capi.root.keys(globalkeys)
+	setter(globalkeys)
 
     if not notify_keychain then
         notify_keychain = naughty.notify({
@@ -48,25 +47,47 @@ function push(mytable,ftitle)
     end
 end
 
--- removes #mytable items from the end of globalkeys
--- FIXME: add some fool-protection, man..
-function pop(mytable)
-	local newkeys = {}
-    for _, k in ipairs(mytable) do
-		newkeys = awful.util.table.join(newkeys, k.keys)
-    end
+-- Will inser keys from mytable to the end of globalkeys
+-- one has to call pop() with same mytable
+function push(mytable,ftitle)
+    return push_(mytable, ftitle, 
+        function(val) capi.root.keys(val) end,
+        function() return capi.root.keys() end)
+end
 
-	local globalkeys = capi.root.keys()
+function push_client(mytable,ftitle, c)
+    return push_(mytable, ftitle, 
+        function(val) c:keys(val) end,
+        function() return c:keys() end)
+end
+
+-- removes previously set items from the end of keys
+function pop_(setter, getter)
+
+	local globalkeys = getter()
     for k, v in ipairs(newkeys) do
         table.remove(globalkeys)
     end
 
-	capi.root.keys(globalkeys)
+	setter(globalkeys)
+    newkeys = nil
 
     if notify_keychain then
         naughty.destroy(notify_keychain)
         notify_keychain = nil
     end
+end
+
+function pop()
+    return pop_(
+        function(val) capi.root.keys(val) end,
+        function() return capi.root.keys() end)
+end
+
+function pop_client(c)
+    return pop_(
+        function(val) c:keys(val) end,
+        function() return c:keys() end)
 end
 
 function key(mod, key, desc, press)

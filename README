@@ -1,14 +1,29 @@
-Hope, you find my work usefull.
+Hope, you'll find my work usefull.
 
-Here is some default bindings:
+Here are some default bindings:
 
-Crtl+modkey+s - tag manipulation submenu (rename, add, del, etc)
+==== Client keys:
+
+altkey+` - show client context menu
+Ctrl+modkey+d - client settings keymode
+
+==== Tag keys:
 
 altkey+F1 - jump to one tag left
 altkey+F2 - jump to one tag right
-
 modkey+F1 - move current clinet one tag left
 modkey+F2 - move current clinet one tag right
 
+altkey+tab - toggle last 2 active clients
+
+Crtl+modkey+s - tag manipulation keymode (rename, add, del, etc)
+
+==== Menus:
+
+altkey+Esc - show main menu
+
+There are vim keybindings defained in menus (hjkl - move, o - open, Enter - open)
+
 Mail bugs to ierton@gmail.com.
+
 Sergey.

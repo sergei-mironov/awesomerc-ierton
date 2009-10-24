@@ -69,7 +69,6 @@ function get_titlebar(c, def)
 end
 
 function save_geometry(c, val)
---    local geom = c:geometry()
 	myrc.memory.set("geometry", client_name(c), val)
 	c:geometry(val)
 end
@@ -80,7 +79,7 @@ end
 
 
 -- Builds menu for client c
-function build_client_menu(c)
+function build_client_menu(c, kg)
 	if mycontextmenu then awful.menu.hide(mycontextmenu) end
 	local centered = get_centered(c)
 	local floating = get_floating(c)
@@ -118,7 +117,7 @@ function build_client_menu(c)
 		}, 
 		height = beautiful.menu_context_height 
 	} )
-	mycontextmenu:show()
+	awful.menu.show(mycontextmenu, kg)
 end
 --}}}
 
@@ -311,7 +310,7 @@ end
 
 tagkeys = {
     myrc.keybind.key({}, "Escape", "Cancel", function () 
-		myrc.keybind.pop(tagkeys) 
+		myrc.keybind.pop() 
 	end),
 
     myrc.keybind.key({}, "s", "Rename current tag", function () 
@@ -323,7 +322,7 @@ tagkeys = {
 			end, 
             awful.completion.bash,
             awful.util.getdir("cache") .. "/tag_rename")
-		myrc.keybind.pop(tagkeys);
+		myrc.keybind.pop();
     end),
 
 	myrc.keybind.key({}, "c", "Create new tag", function () 
@@ -336,12 +335,12 @@ tagkeys = {
 			end, 
 			awful.completion.bash,
 			awful.util.getdir("cache") .. "/tag_new")
-		myrc.keybind.pop(tagkeys);
+		myrc.keybind.pop();
 	end),
 
 	myrc.keybind.key({}, "d", "Delete current tag", function () 
 		myrc.tagman.del(awful.tag.selected()) 
-		myrc.keybind.pop(tagkeys);
+		myrc.keybind.pop();
 	end)
 }
 
@@ -349,7 +348,7 @@ for i=1,9 do
 	table.insert(tagkeys, 
 		myrc.keybind.key({}, tostring(i), "Move tag to position " .. tostring(i), function()
 			myrc.tagman.move(awful.tag.selected(), i)
-			myrc.keybind.pop(tagkeys)
+			myrc.keybind.pop()
 		end))
 end
 
@@ -360,7 +359,6 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
 	awful.key({ modkey            }, "i", function () awful.util.spawn(env.im) end),
 	awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
---    awful.key({ modkey            }, "r", function () awful.util.spawn(env.terminal_root) end),
 	awful.key({ altkey            }, "Escape", function() myrc.mainmenu.show_at(mymainmenu,true) end),
 	awful.key({ modkey, "Control" }, "r", function() 
 		mypromptbox[mouse.screen].widget.text = awful.util.escape(awful.util.restart())
@@ -391,7 +389,7 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
 	awful.key({ modkey, "Control"   }, "s", function () 
-		myrc.keybind.push(tagkeys, "Do smth on tags") 
+		myrc.keybind.push(tagkeys, "Tags action") 
 	end),
 
 	-- Prompt
@@ -411,12 +409,6 @@ globalkeys = awful.util.table.join(
 			awful.util.eval, 
 			awful.prompt.bash,
 			awful.util.getdir("cache") .. "/history_eval")
-	end),
-
-	awful.key({ modkey, "Ctrl" }, "m", function ()
-		for k, i in ipairs(tagkeys) do
-			dbg({ i.keysym  })
-		end
 	end),
 
 	awful.key({ modkey, "Ctrl" }, "i", function ()
@@ -441,7 +433,6 @@ globalkeys = awful.util.table.join(
 
 root.keys(globalkeys)
 
--- Client awful tagging: this is useful to tag some clients and then do stuff like move to tag on them
 clientkeys = awful.util.table.join(
     awful.key({ modkey }, "F1", 
 		function (c) 
@@ -461,16 +452,48 @@ clientkeys = awful.util.table.join(
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
         end),
-    awful.key({ modkey }, "s", function (c) c.fullscreen = not c.fullscreen  end),
-    awful.key({ modkey }, "m", function(c) save_floating(c, not awful.client.floating.get(c)) end),
+
+    awful.key({ altkey }, "`", function(c) build_client_menu(c, true) end),
+    awful.key({ modkey , "Ctrl" }, "d", function(c) 
+        myrc.keybind.push_client( {
+            myrc.keybind.key({}, "Escape", "Cancel", function (c) 
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({}, "f", "Toggle floating", function (c) 
+                save_floating(c, not awful.client.floating.get(c))
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({}, "c", "Toggle centered", function (c) 
+                save_centered(c, not get_centered(c, false))
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({}, "t", "Toggle titlebar", function (c) 
+                save_titlebar(c, not get_titlebar(c, false)) 
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({}, "g", "Save geometry", function (c) 
+                save_geometry(c, get_geometry(c))
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({}, "s", "Toggle fullscreen", function (c) 
+                c.maximized_horizontal = not c.maximized_horizontal
+                c.maximized_vertical   = not c.maximized_vertical
+                myrc.keybind.pop_client(c) 
+            end),
+        } , "Change '" .. c.name .. "' settings", c) 
+    end),
     awful.key({ modkey }, "t", awful.client.togglemarked )
 )
-
 
 clientbuttons = awful.util.table.join(
 	awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
 	awful.button({ modkey }, 1, awful.mouse.client.move),
-	awful.button({ modkey }, 3, awful.mouse.client.resize)
+    awful.button({ modkey }, 3, awful.mouse.client.resize)
 )
 -- }}}
 
@@ -500,10 +523,6 @@ client.add_signal("manage", function (c, startup)
 		if centered then 
 			save_centered(c, centered)
 		end
---        local c_geometry = c:geometry()
---        if c_geometry.x < 0 or c_geometry.y < 0 then
---            awful.placement.centered(c)
---        end
 		local geom = get_geometry(c)
 		if geom then
 			save_geometry(c, geom)
@@ -532,24 +551,6 @@ client.add_signal("manage", function (c, startup)
     -- Do this after tag mapping, so you don't see it on the wrong tag for a split second.
     client.focus = c
 end)
-
--- Hook function to execute when arranging the screen.
--- (tag switch, new client, etc)
---awful.hooks.arrange.register(function (screen)
---    local layout = awful.layout.getname(awful.layout.get(screen))
---    if layout and beautiful["layout_" ..layout] then
---        mylayoutbox[screen].image = image(beautiful["layout_" .. layout])
---    else
---        mylayoutbox[screen].image = nil
---    end
-
---     Give focus to the latest client in history if no window has focus
---     or if the current window is a desktop or a dock one.
---    if not client.focus then
---        local c = awful.client.focus.history.get(screen, 0)
---        if c then client.focus = c end
---    end
---end)
 
 
 
