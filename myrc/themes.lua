@@ -35,7 +35,14 @@ function menu()
 end
 
 function current()
-	return awful.util.getdir("config") .. "/themes/.current"
+    local filename = awful.util.getdir("config") .. "/themes/.current"
+    local handle = io.open(filename)
+    if handle == nil then
+        return awful.util.getdir("config") .. "/themes/blue-black-red/theme.lua"
+    else
+        io.close(handle)
+        return filename
+    end
 end
 
 

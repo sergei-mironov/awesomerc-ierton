@@ -46,6 +46,7 @@ function save_centered(c, val)
 	myrc.memory.set("centered", client_name(c), val)
 	if val == true then
 		awful.placement.centered(c)
+        save_floating(c, true)
 	end
 	return val
 end
