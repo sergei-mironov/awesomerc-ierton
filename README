@@ -1,4 +1,42 @@
+Hello. You are reading Sergey (ierton) Mironov's config readme.
 Hope, you'll find my work usefull.
+
+The directory structure of config:
+.
+|-- README                          This file
+|-- freedesktop                     Freedesktop-menu from Gustavo Dutra.
+|                                   http://github.com/terceiro/awesome-freedesktop/tree
+|-- icons                           Some common icons for theme
+|-- memory.data
+|-- myrc                            Directory with my config libs
+|   |-- keybind.lua                 Library for defining key sequence
+|   |-- mainmenu.lua                Main menu generator
+|   |-- memory.lua                  Registry routines (client states are saved here)
+|   |-- tagman.lua                  Tag routines (renaming, adding, deleting, ...)
+|   `-- themes.lua
+|-- rc-def.lua
+|-- rc-noshifty.lua
+|-- rc-pure.lua                     This is main config
+|-- rc-shifty.lua
+|-- rc-wmiitag.lua
+|-- rc.lua -> rc-pure.lua           Symlink for awesome
+|-- table.save-0.94.lua
+|-- themes                          Theme collection
+|   |-- blue-black-red              My current theme files are here
+|   |   |-- theme.lua               My current theme config
+|   |   `-- titlebar
+|   |-- default -> /usr/share/awesome/themes/default
+|   |                               Default theme
+|   `-- sky -> /usr/share/awesome/themes/sky
+|                                   Another default theme
+|-- tsave.lua -> table.save-0.94.lua
+|                                   Main thing for registry to work
+`-- wallpapers                      Wallpaper collection
+    `-- vladstudio-1.jpg
+
+
+
+
 
 Here are some default bindings:
 
@@ -25,5 +63,9 @@ altkey+Esc - show main menu
 There are vim keybindings defained in menus (hjkl - move, o - open, Enter - open)
 
 Mail bugs to ierton@gmail.com.
+
+TDOD: implemet 'classic' alt+tab functionality
+TDOD: add client renaming
+TDOD: save tag's state to registry
 
 Sergey.
