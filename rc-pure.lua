@@ -139,6 +139,7 @@ env = {
 	home_dir = os.getenv("HOME"),
 	music_show = "gmpc --replace",
 	music_hide = "gmpc --quit",
+	run = "gmrun"
 }
 
 -- Noughty
@@ -261,7 +262,11 @@ for s = 1, screen.count() do
     -- Create a tasklist widget
     mytasklist[s] = awful.widget.tasklist(
 		function(c)
-			return awful.widget.tasklist.label.currenttags(c, s)
+            local text,bg,st,icon = awful.widget.tasklist.label.currenttags(c, s)
+--            local text,bg,st,icon = awful.widget.tasklist.label.focused(c, s)
+--            local usertext = awful.client.property.get(c, "name")
+--            if usertext ~= nil then text = usertext end
+            return text,bg,st,icon
 		end, mytasklist.buttons)
 
     -- Create the wibox
@@ -370,6 +375,8 @@ globalkeys = awful.util.table.join(
 	-- Client manipulation
 	awful.key({ altkey            }, "j", function () switch_to_client(-1) end),
 	awful.key({ altkey            }, "k", function () switch_to_client(1) end),
+	awful.key({ altkey            }, "q", function () switch_to_client(-1) end),
+	awful.key({ altkey            }, "w", function () switch_to_client(1) end),
 	awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(1) end),
 	awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx(-1) end),
 	awful.key({ modkey, "Control" }, "j", function () awful.screen.focus(1) end),
@@ -466,8 +473,13 @@ clientkeys = awful.util.table.join(
                 myrc.keybind.pop_client(c) 
             end),
 
-            myrc.keybind.key({}, "c", "Toggle centered", function (c) 
-                save_centered(c, not get_centered(c, false))
+            myrc.keybind.key({}, "c", "Set centered on", function (c) 
+                save_centered(c, true)
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({"Shift"}, "c", "Set centered off", function (c) 
+                save_centered(c, false)
                 myrc.keybind.pop_client(c) 
             end),
 
@@ -484,6 +496,16 @@ clientkeys = awful.util.table.join(
             myrc.keybind.key({}, "s", "Toggle fullscreen", function (c) 
                 c.maximized_horizontal = not c.maximized_horizontal
                 c.maximized_vertical   = not c.maximized_vertical
+                myrc.keybind.pop_client(c) 
+            end),
+
+            myrc.keybind.key({}, "r", "Rename", function (c) 
+                awful.prompt.run(
+                    { prompt = "Rename client: " }, 
+                    mypromptbox[mouse.screen].widget, 
+                    function(n) awful.client.property.set(c,"name", n) end,
+                    awful.completion.bash,
+                    awful.util.getdir("cache") .. "/rename")
                 myrc.keybind.pop_client(c) 
             end),
         } , "Change '" .. c.name .. "' settings", c) 

@@ -29,6 +29,7 @@ function build()
 	local man = (env.man or "xterm -e man") .. " "
 	local editor = (env.editor or "xterm -e " .. (os.getenv("EDITOR") or "vim")) .. " "
 	local browser = (env.browser or "firefox") .. " "
+	local run = (env.run or "gmrun")
 
 	freedesktop_utils.terminal = terminal
 	freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -54,7 +55,8 @@ function build()
 	}
 
 	local mymainmenu_items_tail = {
-		{"", nil, nil}, --separator
+		{ "", nil, nil}, --separator
+		{ "Run", run, nil },
 		{ "Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'gtk-refresh' }) },
 		{ "Quit", awesome.quit, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) } 
 	}
