@@ -28,7 +28,8 @@ function client_name(c)
     local cls = c.class or ""
     local inst = c.instance or ""
 	local role = c.role or ""
-	return cls..":"..inst..":"..role
+	local ctype = c.type
+	return cls..":"..inst..":"..role..":"..ctype
 end
 
 function save_floating(c, f)
@@ -539,6 +540,10 @@ end)
 client.add_signal("manage", function (c, startup)
 
 	local name = client_name(c)
+	if c.type == "dialog" then 
+		save_centered(c, true)
+	end
+
 	local floating = myrc.memory.get("floating", name, awful.client.floating.get(c))
 	save_floating(c, floating)
 	if floating == true then
