@@ -28,7 +28,7 @@ function client_name(c)
     local cls = c.class or ""
     local inst = c.instance or ""
 	local role = c.role or ""
-	local ctype = c.type
+	local ctype = c.type or ""
 	return cls..":"..inst..":"..role..":"..ctype
 end
 
