@@ -430,11 +430,14 @@ globalkeys = awful.util.table.join(
 				text = text .. "Instance: ".. client.focus.instance .. " "
 			end
 			if client.focus.role then
-				text = text .. "Role: ".. client.focus.role
+				text = text .. "Role: ".. client.focus.role .. " "
 			end
 			if client.focus.type then
-				text = text .. "Type: ".. client.focus.type
+				text = text .. "Type: ".. client.focus.type .. " "
 			end
+
+			text = text .. "Full name: '" .. client_name(client.focus) .. "'"
+
 			dbg({text})
 		end
 	end)

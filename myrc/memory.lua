@@ -44,9 +44,9 @@ function get(table, key, defvalue)
 
 	if type(tables[table]) == "nil" then
 		return defvalue
-	elseif type(tables[table][key]) == nil then
-		local oldkey = string.gsub(key,"(%w+:%w+:%w+):%w+", "%1")
-		if type(tables[table][oldkey]) == nil then
+	elseif type(tables[table][key]) == "nil" then
+		local oldkey = string.gsub(key,"([^:]*:[^:]*:[^:]*):[^:]*", "%1")
+		if type(tables[table][oldkey]) == "nil" then
 			return defvalue
 		end
 		return tables[table][oldkey]
