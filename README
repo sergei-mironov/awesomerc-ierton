@@ -44,6 +44,8 @@ Here are some default bindings:
 
 altkey+` - show client context menu
 Ctrl+modkey+d - client settings keymode
+altkey+1 - prev client
+altkey+2 - next client
 
 ==== Tag keys:
 

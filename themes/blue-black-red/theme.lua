@@ -7,7 +7,8 @@ theme.name = "blue-black-red"
 theme.config = awful.util.getdir("config")
 theme.path = theme.config .. "/themes/" .. theme.name
 
-theme.font          = "terminus 9"
+-- theme.font          = "terminus 9"
+theme.font          = "Sans 9"
 
 theme.bg_normal     = "#272C30"
 theme.bg_focus      = "#7985A3"
@@ -31,8 +32,8 @@ theme.border_marked = "#A3BA8C"
 theme.taglist_bg_focus = "#990000"
 
 -- Display the taglist squares
---taglist_squares_sel = "/usr/share/awesome/themes/default/taglist/squarefw.png"
---taglist_squares_unsel = "/usr/share/awesome/themes/default/taglist/squarew.png"
+theme.taglist_squares_sel = "/usr/share/awesome/themes/default/taglist/squarefw.png"
+theme.taglist_squares_unsel = "/usr/share/awesome/themes/default/taglist/squarew.png"
 theme.tasklist_floating_icon = "/usr/share/awesome/themes/default/tasklist/floatingw.png"
 
 -- Variables set for theming menu
