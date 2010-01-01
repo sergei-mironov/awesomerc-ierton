@@ -8,7 +8,7 @@ theme.config = awful.util.getdir("config")
 theme.path = theme.config .. "/themes/" .. theme.name
 
 -- theme.font          = "terminus 9"
-theme.font          = "Sans 9"
+theme.font          = "Sans 8"
 
 theme.bg_normal     = "#272C30"
 theme.bg_focus      = "#7985A3"
