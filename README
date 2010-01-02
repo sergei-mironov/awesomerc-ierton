@@ -1,5 +1,8 @@
 Hello. You are reading Sergey (ierton) Mironov's config readme.
-Hope, you'll find my work usefull.
+I hope you'll find my work usefull.
+
+DIRECTORY STRUCTURE
+===================
 
 The directory structure of config:
 .
@@ -36,16 +39,23 @@ The directory structure of config:
 
 
 
-
+DEFAULT KEYBINDINGS
+===================
 
 Here are some default bindings:
 
 ==== Client keys:
 
 altkey+` - show client context menu
-Ctrl+modkey+d - client settings keymode
+Ctrl+modkey+d - start client settings chord
+Ctrl+modkey+d,c - Center client
+Ctrl+modkey+d,f - Set client to be floating
+Ctrl+modkey+d,F - Remove floating
+and so on (read tooltip)
+
 altkey+1 - prev client
 altkey+2 - next client
+altkey+tab - toggle last 2 active clients
 
 ==== Tag keys:
 
@@ -53,21 +63,26 @@ altkey+F1 - jump to one tag left
 altkey+F2 - jump to one tag right
 modkey+F1 - move current clinet one tag left
 modkey+F2 - move current clinet one tag right
+modkey+tab - switch to previous tag
 
-altkey+tab - toggle last 2 active clients
-
-Crtl+modkey+s - tag manipulation keymode (rename, add, del, etc)
+Crtl+modkey+s - begin tag manipulation chord (tooltip will appear)
+Crtl+modkey+s,s - rename current tag
+Crtl+modkey+s,c - create a tag
+Crtl+modkey+s,d - delete current tag
+and so on
 
 ==== Menus:
 
 altkey+Esc - show main menu
+altkey+` - show client menu
 
 There are vim keybindings defained in menus (hjkl - move, o - open, Enter - open)
 
 Mail bugs to ierton@gmail.com.
 
-TDOD: implemet 'classic' alt+tab functionality
-TDOD: add client renaming
-TDOD: save tag's state to registry
+TDOD: Implemet M$Windows alt+tab functionality (don't know how to capture
+altkey release event)
+TDOD: Implement client renaming
+TODO: Fix menu non-dissapearing
 
 Sergey.

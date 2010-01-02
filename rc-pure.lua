@@ -19,7 +19,27 @@ function dbg(vars)
 	local text = ""
 	for i=1, #vars-1 do text = text .. tostring(vars[i]) .. " | " end
 	text = text .. tostring(vars[#vars])
-	naughty.notify({ text = text, timeout = 60 })
+	naughty.notify({ text = text, timeout = 10 })
+end
+
+function dbg_client(c)
+	local text = ""
+	if c.class then
+		text = text .. "Class: " .. c.class .. " "
+	end
+	if c.instance then
+		text = text .. "Instance: ".. c.instance .. " "
+	end
+	if c.role then
+		text = text .. "Role: ".. c.role .. " "
+	end
+	if c.type then
+		text = text .. "Type: ".. c.type .. " "
+	end
+
+	text = text .. "Full name: '" .. client_name(c) .. "'"
+
+	dbg({text})
 end
 --}}}
 
@@ -70,6 +90,20 @@ function get_titlebar(c, def)
 	return myrc.memory.get("titlebar", client_name(c), def)
 end
 
+function save_tag(c, tag)
+	local tn = "none"
+	if tag then tn = tag.name end
+	myrc.memory.set("tags", client_name(c), tn)
+	if tag ~= nil and tag ~= awful.tag.selected() then 
+		awful.client.movetotag(tag, c) 
+	end
+end
+
+function get_tag(c, def)
+	local tn = myrc.memory.get("tags", client_name(c), def)
+	return myrc.tagman.find(tn)
+end
+
 function save_geometry(c, val)
 	myrc.memory.set("geometry", client_name(c), val)
 	c:geometry(val)
@@ -115,7 +149,18 @@ function build_client_menu(c, kg)
 			{ "Toggle maximize", function () 
 				c.maximized_horizontal = not c.maximized_horizontal
 				c.maximized_vertical   = not c.maximized_vertical
-				end, }
+				end, },
+			{ "Bind to this tag", function ()
+				local t = awful.tag.selected()
+				naughty.notify({text = 
+					"Client " .. c.name .. " was bound to tag " .. t.name}) 
+                save_tag(c, t) 
+				end, },
+			{ "Unbind from tags", function ()
+                save_tag(c, nil) 
+				naughty.notify({text = 
+					"Client " .. c.name .. " was unbound from tags "}) 
+				end, },
 		}, 
 		height = beautiful.menu_context_height 
 	} )
@@ -175,7 +220,7 @@ beautiful.init(myrc.themes.current())
 
 myrc.mainmenu.init(env)
 
-myrc.tagman.init()
+myrc.tagman.init(myrc.memory.get("tagnames", "-", nil))
 
 --awful.titlebar.button_groups.close_buttons.align = "right"
 
@@ -305,7 +350,6 @@ root.buttons(awful.util.table.join(
 
 -- {{{ Key bindings
 -- Standard program
-
 function switch_to_client(direction)
 	if direction == 0 then
 		awful.client.focus.history.previous()
@@ -315,48 +359,13 @@ function switch_to_client(direction)
 	if client.focus then client.focus:raise() end
 end
 
-tagkeys = {
-    myrc.keybind.key({}, "Escape", "Cancel", function () 
-		myrc.keybind.pop() 
-	end),
-
-    myrc.keybind.key({}, "s", "Rename current tag", function () 
-        awful.prompt.run(
-            { prompt = "Rename this tag: " }, 
-            mypromptbox[mouse.screen].widget, 
-            function(newname) 
-				myrc.tagman.rename(awful.tag.selected(),newname) 
-			end, 
-            awful.completion.bash,
-            awful.util.getdir("cache") .. "/tag_rename")
-		myrc.keybind.pop();
-    end),
-
-	myrc.keybind.key({}, "c", "Create new tag", function () 
-		awful.prompt.run(
-			{ prompt = "Create new tag: " }, 
-			mypromptbox[mouse.screen].widget, 
-			function(newname) 
-				local t = myrc.tagman.add(newname) 
-				myrc.tagman.move(t, awful.tag.selected()) 
-			end, 
-			awful.completion.bash,
-			awful.util.getdir("cache") .. "/tag_new")
-		myrc.keybind.pop();
-	end),
-
-	myrc.keybind.key({}, "d", "Delete current tag", function () 
-		myrc.tagman.del(awful.tag.selected()) 
-		myrc.keybind.pop();
-	end)
-}
-
-for i=1,9 do
-	table.insert(tagkeys, 
-		myrc.keybind.key({}, tostring(i), "Move tag to position " .. tostring(i), function()
-			myrc.tagman.move(awful.tag.selected(), i)
-			myrc.keybind.pop()
-		end))
+function switch_to_tag(name)
+	local t = myrc.tagman.find(name)
+	if t == nil then
+		naughty.notify({text = "Can't find tag " .. name})
+		return
+	end
+	awful.tag.viewonly(t)
 end
 
 -- Bind keyboard digits
@@ -373,6 +382,14 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey },            "r", function () mypromptbox[mouse.screen]:run() end),
 	awful.key({ modkey, "Control" }, "q", awesome.quit),
 
+	-- Tag hotkeys
+	awful.key({ modkey, "Control" }, "m", function () switch_to_tag("im") end),
+	awful.key({ modkey, "Control" }, "w", function () switch_to_tag("work") end),
+	awful.key({ modkey, "Control" }, "s", function () switch_to_tag("sys") end),
+	awful.key({ modkey, "Control" }, "n", function () switch_to_tag("net") end),
+	awful.key({ modkey, "Control" }, "f", function () switch_to_tag("fun") end),
+	awful.key({ modkey            }, "Tab", function() awful.tag.history.restore() end),
+
 	-- Client manipulation
 	awful.key({ altkey            }, "j", function () switch_to_client(-1) end),
 	awful.key({ altkey            }, "k", function () switch_to_client(1) end),
@@ -380,66 +397,70 @@ globalkeys = awful.util.table.join(
 	awful.key({ altkey            }, "2", function () switch_to_client(1) end),
 	awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(1) end),
 	awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx(-1) end),
-	awful.key({ modkey, "Control" }, "j", function () awful.screen.focus(1) end),
-	awful.key({ modkey, "Control" }, "k", function () awful.screen.focus(-1) end),
-	awful.key({ modkey            }, "Tab", function() switch_to_client(0) end),
 	awful.key({ altkey            }, "Tab", function() switch_to_client(0) end),
+	awful.key({ modkey, "Control" }, "i", function () dbg_client(client.focus) end),
 
 	-- Layout manipulation
     awful.key({ altkey,           }, "F1", awful.tag.viewprev ),
     awful.key({ altkey,           }, "F2", awful.tag.viewnext ),
-	awful.key({ modkey,           }, "h", function () awful.tag.incmwfact(-0.05) end),
-	awful.key({ modkey,           }, "l", function () awful.tag.incmwfact(0.05) end),
-	awful.key({ modkey, "Shift"   }, "h", function () awful.tag.incnmaster(1) end),
-	awful.key({ modkey, "Shift"   }, "l", function () awful.tag.incnmaster(-1) end),
-	awful.key({ modkey, "Control" }, "h", function () awful.tag.incncol(1) end),
-	awful.key({ modkey, "Control" }, "l", function () awful.tag.incncol(-1) end),
+	awful.key({ altkey,           }, "h", function () awful.tag.incmwfact(-0.05) end),
+	awful.key({ altkey,           }, "l", function () awful.tag.incmwfact(0.05) end),
+	awful.key({ altkey, "Shift"   }, "h", function () awful.tag.incnmaster(1) end),
+	awful.key({ altkey, "Shift"   }, "l", function () awful.tag.incnmaster(-1) end),
+	awful.key({ altkey, "Control" }, "h", function () awful.tag.incncol(1) end),
+	awful.key({ altkey, "Control" }, "l", function () awful.tag.incncol(-1) end),
 	awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts, 1) end),
 	awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
+	-- Tagset operations (Win+Ctrl+s,<letter> chords)
 	awful.key({ modkey, "Control"   }, "s", function () 
-		myrc.keybind.push(tagkeys, "Tags action") 
-	end),
+		myrc.keybind.push({
+			myrc.keybind.key({}, "Escape", "Cancel", function () 
+				myrc.keybind.pop() 
+			end),
 
-	-- Prompt
-	awful.key({ modkey }, "F5", function ()
-		awful.prompt.run(
-			{ prompt = "Run: " }, 
-			mypromptbox[mouse.screen].widget, 
-			awful.util.spawn, 
-			awful.completion.bash,
-			awful.util.getdir("cache") .. "/history")
-	end),
+			myrc.keybind.key({}, "Return", "Cancel", function () 
+				myrc.keybind.pop() 
+			end),
 
-	awful.key({ modkey }, "F6", function ()
-		awful.prompt.run(
-			{ prompt = "Run Lua code: " }, 
-			mypromptbox[mouse.screen].widget, 
-			awful.util.eval, 
-			awful.prompt.bash,
-			awful.util.getdir("cache") .. "/history_eval")
-	end),
+			myrc.keybind.key({}, "s", "Rename current tag", function () 
+				awful.prompt.run(
+				{ prompt = "Rename this tag: " }, 
+				mypromptbox[mouse.screen].widget, 
+				function(newname) 
+					myrc.tagman.rename(awful.tag.selected(),newname) 
+				end, 
+				awful.completion.bash,
+				awful.util.getdir("cache") .. "/tag_rename")
+				myrc.keybind.pop()
+			end),
 
-	awful.key({ modkey, "Ctrl" }, "i", function ()
-		if client.focus then
-			local text = ""
-			if client.focus.class then
-				text = text .. "Class: " .. client.focus.class .. " "
-			end
-			if client.focus.instance then
-				text = text .. "Instance: ".. client.focus.instance .. " "
-			end
-			if client.focus.role then
-				text = text .. "Role: ".. client.focus.role .. " "
-			end
-			if client.focus.type then
-				text = text .. "Type: ".. client.focus.type .. " "
-			end
+			myrc.keybind.key({}, "c", "Create new tag", function () 
+				awful.prompt.run(
+				{ prompt = "Create new tag: " }, 
+				mypromptbox[mouse.screen].widget, 
+				function(newname) 
+					local t = myrc.tagman.add(newname) 
+					myrc.tagman.move(t, awful.tag.selected()) 
+				end, 
+				awful.completion.bash,
+				awful.util.getdir("cache") .. "/tag_new")
+				myrc.keybind.pop()
+			end),
 
-			text = text .. "Full name: '" .. client_name(client.focus) .. "'"
+			myrc.keybind.key({}, "d", "Delete current tag", function () 
+				myrc.tagman.del(awful.tag.selected()) 
+				myrc.keybind.pop()
+			end), 
 
-			dbg({text})
-		end
+			myrc.keybind.key({}, "k", "Move tag right", function () 
+				myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(0))
+			end), 
+
+			myrc.keybind.key({}, "j", "Move tag left", function () 
+				myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(-2))
+			end)
+		}, "Tags action") 
 	end)
 )
 
@@ -512,9 +533,21 @@ clientkeys = awful.util.table.join(
                     awful.util.getdir("cache") .. "/rename")
                 myrc.keybind.pop_client(c) 
             end),
+
+            myrc.keybind.key({}, "d", "Stick to this tag", function (c) 
+				local t = awful.tag.selected()
+                save_tag(c, t) 
+				naughty.notify({text = "Client " .. c.name .. " was bound to tag " .. t.name}) 
+                myrc.keybind.pop_client(c) 
+            end), 
+
+            myrc.keybind.key({"Shift"}, "d", "Unbound from any tag", function (c) 
+                save_tag(c, nil) 
+				naughty.notify({text = "Client " .. c.name .. " was unbound from tag"}) 
+                myrc.keybind.pop_client(c) 
+            end)
         } , "Change '" .. c.name .. "' settings", c) 
-    end),
-    awful.key({ modkey }, "t", awful.client.togglemarked )
+    end)
 )
 
 clientbuttons = awful.util.table.join(
@@ -564,6 +597,11 @@ client.add_signal("manage", function (c, startup)
 		end
 	end
 
+	local tag = get_tag(c, nil)
+	if tag ~= nil then
+		awful.client.movetotag(tag,c)
+	end
+
     -- Set key bindings
     c:buttons(clientbuttons)
     c:keys(clientkeys)
@@ -583,5 +621,8 @@ client.add_signal("manage", function (c, startup)
     client.focus = c
 end)
 
+awful.tag.attached_add_signal(nil, "tagman::update", function (t) 
+	myrc.memory.set("tagnames","-", myrc.tagman.names())
+end)
 
 

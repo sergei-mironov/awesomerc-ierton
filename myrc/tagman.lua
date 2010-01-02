@@ -5,7 +5,8 @@ local capi = {
 	io = io,
 	screen = screen,
 	tag = tag,
-	mouse = mouse
+	mouse = mouse,
+	client = client
 }
 
 local client = client
@@ -20,6 +21,34 @@ module("myrc.tagman")
 
 tags = {}
 
+-- returns tag by name
+function find(name)
+	local s = s or client.focus and client.focus.screen or capi.mouse.screen
+	return tags[s][name]
+end
+
+-- returns list of tag names
+function names()
+	local s = s or client.focus and client.focus.screen or capi.mouse.screen
+	local stags = capi.screen[s]:tags()
+	local result = {}
+	for _,tag in ipairs(stags) do table.insert(result, tag.name) end
+	return result
+end
+
+-- returns tag by index
+function get(index, s)
+	local s = s or client.focus and client.focus.screen or capi.mouse.screen
+	local stags = capi.screen[s]:tags()
+    return stags[awful.util.cycle(#stags, index)]
+end
+
+-- offset : offset from base tag (+n , -n , 0)
+-- basetag : see code :)
+-- s - screen
+--
+-- returns tag object, which can be passed to functions like 
+-- awful.client.movetotag()
 function getn(offset, basetag, s)
 	local offset = offset or 0
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
@@ -28,7 +57,6 @@ function getn(offset, basetag, s)
 	local k = awful.util.table.hasitem(stags,basetag)
     return stags[awful.util.cycle(#stags, k + offset)]
 end
-
 
 function handle_orphans(s, deftag)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
@@ -49,10 +77,13 @@ function sort(s, fn)
     capi.screen[s]:tags(all_tags)
 end
 
+-- moves tag to position #where (if where is number) -OR- next 
+-- to tag where (if where is object)
 function move(tag, where, s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
 	local oldkey = awful.util.table.hasitem(stags,tag)
+	local c = capi.client.focus
 	if oldkey == nil then return end
 	if type(where) == "number" then
 		local index = awful.util.cycle(#stags, where)
@@ -66,18 +97,20 @@ function move(tag, where, s)
 		table.insert(stags,index,tag)
 	end
 	capi.screen[s]:tags(stags)
+	capi.client.focus = c
+	tag:emit_signal("tagman::update", tag)
 end
 
 function add(tn, props, s)
 	local props = props or {}
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local tn = tostring(tn)
-	--local t = capi.tag(tn)
 	local t = capi.tag {name = tn}
 	t.screen = s
 	awful.layout.set(props.layout or awful.layout.suit.max, t)
 	tags[s][tn] = t
 	if props.setsel == true then t.selected = true end
+	t:emit_signal("tagman::update", t)
 	return t
 end
 
@@ -86,11 +119,12 @@ function del(tag, s)
 	local stags = capi.screen[s]:tags()
 	if #stags <= 1 then return end
 	if tag == stags[1] then awful.tag.viewnext() else awful.tag.viewprev() end
+	tag:emit_signal("tagman::update", tag)
 	tags[s][tag.name] = nil
 	tag.screen = nil
 	--FIXME: When there were 2 tags before del(), clients are dissapearing 
 	--insted of jumping to the last tag.
-	handle_orphans(s,awful.tag.selected())
+	handle_orphans(s, awful.tag.selected(s))
 end
 
 function rename(tag, newname, s)
@@ -98,16 +132,21 @@ function rename(tag, newname, s)
 	tags[s][tag.name] = nil
 	tag.name = newname
 	tags[s][tag.name] = tag
+	tag:emit_signal("tagman::update", tag)
 end
 
-function init()
+function init(namelist)
+	if namelist == nil then
+		namelist = {}
+		for i=1,9 do namelist[i] = tostring(i) end
+	end
+
 	for s = 1, capi.screen.count() do
 		-- Each screen has its own tag table.
 		tags[s] = {}
 
-		-- Create 9 tags per screen.
-		for tagnumber = 1, 9 do 
-			add(tostring(tagnumber), { setsel=(tagnumber==1) } ) 
+		for i, name in ipairs(namelist) do 
+			add(name, { setsel=(i==1) } ) 
 		end
 	end
 end
