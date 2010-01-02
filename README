@@ -17,12 +17,7 @@ The directory structure of config:
 |   |-- memory.lua                  Registry routines (client states are saved here)
 |   |-- tagman.lua                  Tag routines (renaming, adding, deleting, ...)
 |   `-- themes.lua
-|-- rc-def.lua
-|-- rc-noshifty.lua
-|-- rc-pure.lua                     This is main config
-|-- rc-shifty.lua
-|-- rc-wmiitag.lua
-|-- rc.lua -> rc-pure.lua           Symlink for awesome
+|-- rc.lua                     		This is main config
 |-- table.save-0.94.lua
 |-- themes                          Theme collection
 |   |-- blue-black-red              My current theme files are here
