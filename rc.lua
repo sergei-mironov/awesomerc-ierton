@@ -362,7 +362,7 @@ end
 function switch_to_tag(name)
 	local t = myrc.tagman.find(name)
 	if t == nil then
-		naughty.notify({text = "Can't find tag " .. name})
+		naughty.notify({text = "Can't find tag with name '" .. name .. "'"})
 		return
 	end
 	awful.tag.viewonly(t)
@@ -385,7 +385,6 @@ globalkeys = awful.util.table.join(
 	-- Tag hotkeys
 	awful.key({ modkey, "Control" }, "m", function () switch_to_tag("im") end),
 	awful.key({ modkey, "Control" }, "w", function () switch_to_tag("work") end),
-	awful.key({ modkey, "Control" }, "s", function () switch_to_tag("sys") end),
 	awful.key({ modkey, "Control" }, "n", function () switch_to_tag("net") end),
 	awful.key({ modkey, "Control" }, "f", function () switch_to_tag("fun") end),
 	awful.key({ modkey            }, "Tab", function() awful.tag.history.restore() end),
