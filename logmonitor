@@ -1,0 +1,97 @@
+#!/bin/sh
+ 
+#Logs to watch
+logs="/var/log/messages"
+
+#Popup time
+infoPopupTime=5000
+warningPopupTime=8000
+errorPopupTime=11000
+securityPopupTime=11000
+
+#Icons
+infoIcon='/usr/share/icons/gnome/32x32/status/dialog-information.png'
+warningIcon='/usr/share/icons/gnome/32x32/status/dialog-warning.png'
+errorIcon='/usr/share/icons/gnome/32x32/status/dialog-error.png'
+securityIcon='/usr/share/icons/gnome/32x32/status/security-medium.png'
+
+outlang=$HOME/.config/awesome/themes/awesome.outlang
+
+notifier() {
+	while true ; do
+		inotifywait -e modify $logs --format %w 2>/dev/null
+	done
+}
+
+filter() {
+	while read line ; do
+		# cron jobs are boring
+		{ echo $line | grep -q cron ; } && continue
+
+		if echo $line | grep -q warn; then 
+			echo normal 
+		elif echo $line | grep -q err; then 
+			echo error 
+		elif echo $line | grep -q auth; then 
+			echo security
+		elif echo $line | grep -q access; then 
+			echo security 
+		else
+			echo low 
+		fi
+		echo $line
+	done
+}
+
+colorizer() {
+	while { read urgency && read line ; } ; do
+		echo $urgency
+		echo $line | source-highlight --failsafe --src-lang=log --style-file=default.style --outlang-def=$outlang
+	done
+}
+
+sender() {
+	# Message header
+	local header=$1
+	while { read urgency && read line ; } ; do
+		case $urgency in 
+			low)
+            urgency="low"
+            icon=$infoIcon
+            tpopup=$infoPopupTime
+			;;
+			normal)
+            urgency="normal"
+			icon=$warningIcon
+            tpopup=$warningPopupTime
+			;;
+			*)
+            urgency="critical"
+            icon=$errorIcon
+            tpopup=$errorPopupTime
+			;;
+		esac
+
+		notify-send -u "$urgency" -t "$tpopup" -i "$icon" "$header" "$line"
+	done
+}
+
+die() {
+	echo $@ >&2
+	{ echo "critical" ; echo "$@" ; } | sender "Error"
+	exit
+}
+
+check() {
+	which "$1" >/dev/null 2>&1 || die "Please install $1"
+}
+
+check inotifywait
+check source-highlight 
+check notify-send
+for log in $logs ; do test -f $log || die "Unable to read $log" ; done
+
+notifier | while read fname ; do
+	tail -n 1 $fname | filter | colorizer | sender $fname
+done
+

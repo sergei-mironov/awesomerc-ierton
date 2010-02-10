@@ -188,8 +188,12 @@ env = {
 	run = "gmrun"
 }
 
--- Noughty
+-- Naughty
+naughty_width = 700
 naughty.config.position = 'top_right'
+naughty.config.presets.low.width = naughty_width
+naughty.config.presets.normal.width = naughty_width
+naughty.config.presets.critical.width = naughty_width
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts = 
