@@ -394,6 +394,7 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey, "Control" }, "w", function () switch_to_tag("work") end),
 	awful.key({ modkey, "Control" }, "n", function () switch_to_tag("net") end),
 	awful.key({ modkey, "Control" }, "f", function () switch_to_tag("fun") end),
+	awful.key({ modkey, "Control" }, "e", function () switch_to_tag("sys") end),
 	awful.key({ modkey            }, "Tab", function() awful.tag.history.restore() end),
 
 	-- Client manipulation
