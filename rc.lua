@@ -13,6 +13,7 @@ require("myrc.tagman")
 require("myrc.themes")
 require("myrc.keybind")
 require("myrc.memory")
+require("myrc.logmon")
 
 --{{{ Debug 
 function dbg(vars)
@@ -225,6 +226,8 @@ beautiful.init(myrc.themes.current())
 myrc.mainmenu.init(env)
 
 myrc.tagman.init(myrc.memory.get("tagnames", "-", nil))
+
+myrc.logmon.init()
 
 --awful.titlebar.button_groups.close_buttons.align = "right"
 

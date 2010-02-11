@@ -82,14 +82,25 @@ die() {
 	exit
 }
 
-check() {
+check_prog() {
 	which "$1" >/dev/null 2>&1 || die "Please install $1"
 }
 
-check inotifywait
-check source-highlight 
-check notify-send
-for log in $logs ; do test -f $log || die "Unable to read $log" ; done
+check_pid() {
+	local pidfile="$HOME/.logmonitor.pid"
+	test -f "$pidfile" && 
+		die "Another logmonitor instance is running (`cat "$pidfile"`)"
+	echo $$ > "$pidfile"
+	trap "rm $pidfile" EXIT 
+}
+
+check_pid
+check_prog inotifywait
+check_prog source-highlight 
+check_prog notify-send
+for log in $logs ; do 
+	test -f $log || die "Unable to read $log" ; 
+done
 
 notifier | while read fname ; do
 	tail -n 1 $fname | filter | colorizer | sender $fname
