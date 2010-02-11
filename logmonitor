@@ -99,7 +99,7 @@ check_prog inotifywait
 check_prog source-highlight 
 check_prog notify-send
 for log in $logs ; do 
-	test -f $log || die "Unable to read $log" ; 
+	test -r $log || die "Unable to read $log" ; 
 done
 
 notifier | while read fname ; do
