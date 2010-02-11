@@ -46,7 +46,11 @@ filter() {
 colorizer() {
 	while { read urgency && read line ; } ; do
 		echo $urgency
-		echo $line | source-highlight --failsafe --src-lang=log --style-file=default.style --outlang-def=$outlang
+		echo $line | source-highlight \
+			--failsafe \
+			--src-lang=log \
+			--style-file=default.style \
+			--outlang-def=$outlang
 	done
 }
 
@@ -56,19 +60,19 @@ sender() {
 	while { read urgency && read line ; } ; do
 		case $urgency in 
 			low)
-            urgency="low"
-            icon=$infoIcon
-            tpopup=$infoPopupTime
+				urgency="low"
+				icon=$infoIcon
+				tpopup=$infoPopupTime
 			;;
 			normal)
-            urgency="normal"
-			icon=$warningIcon
-            tpopup=$warningPopupTime
+				urgency="normal"
+				icon=$warningIcon
+				tpopup=$warningPopupTime
 			;;
 			*)
-            urgency="critical"
-            icon=$errorIcon
-            tpopup=$errorPopupTime
+				urgency="critical"
+				icon=$errorIcon
+				tpopup=$errorPopupTime
 			;;
 		esac
 
