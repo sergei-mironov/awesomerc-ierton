@@ -28,14 +28,13 @@ errorPopupTime=11000
 securityPopupTime=11000
 
 # Icons
-infoIcon='/usr/share/icons/gnome/32x32/status/dialog-information.png'
-warningIcon='/usr/share/icons/gnome/32x32/status/dialog-warning.png'
-errorIcon='/usr/share/icons/gnome/32x32/status/dialog-error.png'
-securityIcon='/usr/share/icons/gnome/32x32/status/security-medium.png'
+infoIcon='/usr/share/icons/gnome/16x16/status/sunny.png'
+warningIcon='/usr/share/icons/gnome/16x16/status/dialog-warning.png'
+errorIcon='/usr/share/icons/gnome/16x16/status/dialog-error.png'
+securityIcon='/usr/share/icons/gnome/16x16/status/security-medium.png'
 
 # source-hightlight grammar or so
 outlang=$HOME/.config/awesome/themes/awesome.outlang
-
 
 filter_hide_pppd() { grep -w pppd | grep -qvE 'Welcome|Exit' ; }
 filter_hide_cron() { grep -w cron ; }
@@ -70,7 +69,15 @@ marker() {
 colorizer() {
 	while { read urgency && read line ; } ; do
 		echo $urgency
-		echo $line | source-highlight --failsafe --src-lang=log --style-file=default.style --outlang-def=$outlang
+		# I fonud that source-hightlight has ugle default colors.
+		#echo $line | source-highlight --failsafe --src-lang=log --style-file=default.style --outlang-def=$outlang
+		# Next is an example of manual highlighting
+		proc=`echo $line | sed 's/.\+ .\+ \([^[]\+\)\(\[[0-9]\+\]\)\?: .*/\1/'`
+		echo -n "<span color='#FF00FF'>$proc</span>"
+		pid=`echo $line | sed 's/.\+ .\+ \([^[]\+\)\(\[[0-9]\+\]\)\?: .*/\2/'`
+		echo -n "<span color='#00FFFF'>$pid</span>: "
+		msg=`echo $line | sed 's/.\+ .\+ .\+: //'`
+		echo    "<span color='#BBBBBB'>$msg</span>"
 	done
 }
 
@@ -126,6 +133,4 @@ test -f $log || die "Unable to read $log"
 
 # Main part
 tail -F -n0 $log | filter | marker | colorizer | sender $log
-
-echo $?
 
