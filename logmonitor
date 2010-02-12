@@ -1,44 +1,68 @@
 #!/bin/sh
- 
-#Logs to watch
-logs="/var/log/messages"
+#
+# Copyright (C) 2010 Sergey Mironov
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#Popup time
+# Name of script (for later parsing)
+this=$0
+
+# Log to watch
+log="/var/log/messages"
+
+# Popup time
 infoPopupTime=5000
 warningPopupTime=8000
 errorPopupTime=11000
 securityPopupTime=11000
 
-#Icons
+# Icons
 infoIcon='/usr/share/icons/gnome/32x32/status/dialog-information.png'
 warningIcon='/usr/share/icons/gnome/32x32/status/dialog-warning.png'
 errorIcon='/usr/share/icons/gnome/32x32/status/dialog-error.png'
 securityIcon='/usr/share/icons/gnome/32x32/status/security-medium.png'
 
+# source-hightlight grammar or so
 outlang=$HOME/.config/awesome/themes/awesome.outlang
 
-notifier() {
-	while true ; do
-		inotifywait -e modify $logs --format %w 2>/dev/null
-	done
-}
+
+filter_hide_pppd() { grep -w pppd | grep -qvE 'Welcome|Exit' ; }
+filter_hide_cron() { grep -w cron ; }
+filter_hide_pptp() { grep -w pptp ; }
+hiders=`grep -o 'filter\_hide\_[a-z0-9]*' $this`
 
 filter() {
 	while read line ; do
-		# cron jobs are boring
-		{ echo $line | grep -q cron ; } && continue
+		local failed=""
+		for h in $hiders ; do
+			echo $line | $h > /dev/null && { failed=y ; break ; }
+		done
+		test -z "$failed" && echo $line
+	done
+}
 
-		if echo $line | grep -q warn; then 
-			echo normal 
-		elif echo $line | grep -q err; then 
-			echo error 
-		elif echo $line | grep -q auth; then 
-			echo security
-		elif echo $line | grep -q access; then 
-			echo security 
-		else
-			echo low 
-		fi
+marker_normal() { grep -q "warn" && echo error ; } 
+marker_err() { grep -q "err" && echo error ; } 
+marker_sec() { grep -qE "auth|access" && echo security ; }
+marker_low() { echo low ; }
+markers=`grep -o 'marker\_[a-z0-9]*' $this`
+
+marker() {
+	while read line ; do
+		for m in $markers ; do
+			echo $line | $m && break
+		done
 		echo $line
 	done
 }
@@ -55,7 +79,7 @@ sender() {
 	local header=$1
 	while { read urgency && read line ; } ; do
 		case $urgency in 
-			low)
+			low|security)
             urgency="low"
             icon=$infoIcon
             tpopup=$infoPopupTime
@@ -94,15 +118,14 @@ check_pid() {
 	trap "rm $pidfile" EXIT 
 }
 
+# Dependencies checking
 check_pid
-check_prog inotifywait
 check_prog source-highlight 
 check_prog notify-send
-for log in $logs ; do 
-	test -f $log || die "Unable to read $log" ; 
-done
+test -f $log || die "Unable to read $log"
 
-notifier | while read fname ; do
-	tail -n 1 $fname | filter | colorizer | sender $fname
-done
+# Main part
+tail -F -n0 $log | filter | marker | colorizer | sender $log
+
+echo $?
 
