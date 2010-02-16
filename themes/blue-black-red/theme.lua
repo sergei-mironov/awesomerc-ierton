@@ -10,7 +10,7 @@ theme.path = theme.config .. "/themes/" .. theme.name
 -- theme.font          = "terminus 9"
 theme.font          = "Sans 8"
 
-theme.bg_normal     = "#272C30"
+theme.bg_normal     = "#1c1c1c"
 theme.bg_focus      = "#7985A3"
 theme.bg_urgent     = "#A36666"
 

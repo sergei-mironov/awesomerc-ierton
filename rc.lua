@@ -7,6 +7,7 @@ require("freedesktop.utils")
 require("freedesktop.menu")
 
 require("tsave")
+require("bashets")
 
 require("myrc.mainmenu")
 require("myrc.tagman")
@@ -243,7 +244,8 @@ mylauncher = awful.widget.launcher({
 mysystray = widget({ type = "systray" })
 
 -- Create a wibox for each screen and add it
-mywibox = {}
+mytop = {}
+mybottom = {}
 mypromptbox = {}
 
 -- Clock
@@ -298,6 +300,14 @@ mytasklist.buttons = awful.util.table.join(
 	end) 
 )
 
+-- Bashets
+bashets.set_script_path(awful.util.getdir("config").."/bashets/")
+
+mybatmon = widget({ type = "textbox", name = "batmon", align="right" })
+bashets.register(mybatmon, "batmon.sh", '$1', 20)
+
+bashets.start()
+
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt({layout = awful.widget.layout.horizontal.leftright})
@@ -322,16 +332,9 @@ for s = 1, screen.count() do
             return text,bg,st,icon
 		end, mytasklist.buttons)
 
-    -- Create the wibox
-    mywibox[s] = awful.wibox({ 
-		position = "top", screen = s,
-		fg = beautiful.fg_normal, 
-		bg = beautiful.bg_normal,
-	})
-
-
-    -- Add widgets to the wibox - order matters
-    mywibox[s].widgets = { 
+    -- Create top wibox
+    mytop[s] = awful.wibox({ position = "top", screen = s, })
+    mytop[s].widgets = {
 		{
 			mylauncher,
 			mylayoutbox[s],
@@ -344,6 +347,14 @@ for s = 1, screen.count() do
 		mytasklist[s],
 		layout = awful.widget.layout.horizontal.rightleft
 	}
+
+    -- Create bottom wibox
+    mybottom[s] = awful.wibox({ position = "bottom", screen = s, })
+    mybottom[s].widgets = {
+		mybatmon,
+		layout = awful.widget.layout.horizontal.leftright
+	}
+
 end
 -- }}}
 
