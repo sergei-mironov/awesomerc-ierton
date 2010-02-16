@@ -24,16 +24,19 @@ local notify_keychain = nil
 
 local newkeys = nil
 
-function push_(mytable,ftitle, setter, getter)
+function push_(mytable, ftitle, setter, getter)
 	local description = ""
+	newkeys = nil
     for _, k in ipairs(mytable) do
 		newkeys = awful.util.table.join(newkeys, k.keys)
 		description = description .. "\n"
 		description = description ..  tostring(k.keysym) .. ": " ..  ( k.desc or "<no_description>" )
     end
 
-	local globalkeys = awful.util.table.join(
-		getter(), newkeys)
+	local globalkeys = getter()
+	for _,k in ipairs(newkeys) do
+		table.insert(globalkeys, k)
+	end
 
 	setter(globalkeys)
 

@@ -75,9 +75,10 @@ There are vim keybindings defained in menus (hjkl - move, o - open, Enter - open
 
 Mail bugs to ierton@gmail.com.
 
-TDOD: Implemet M$Windows alt+tab functionality (don't know how to capture
+TODO: Implemet M$Windows alt+tab functionality (don't know how to capture
 altkey release event)
-TDOD: Implement client renaming
+TODO: Implement client renaming
 TODO: Fix menu non-dissapearing
+TODO: Rewrite keybind.lua
 
 Sergey.
