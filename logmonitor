@@ -41,6 +41,8 @@ filter_hide_autofs() { grep -w automount | grep -qvE 'expired|mounted' ; }
 filter_hide_cron() { grep -w cron ; }
 filter_hide_pptp() { grep -w pptp ; }
 filter_hide_sudo() { grep -w sudo ; }
+filter_hide_ntp() { grep -w ntpd ; }
+filter_hide_stack() { grep "used greatest stack depth" ; }
 hiders=`grep -o 'filter\_hide\_[a-z0-9]*' $this`
 
 filter() {
@@ -121,18 +123,18 @@ check_prog() {
 
 check_pid() {
 	local pidfile="$HOME/.logmonitor.pid"
-	test -f "$pidfile" && 
-		die "Another logmonitor instance is running (`cat "$pidfile"`)"
+	test -f "$pidfile" && pkill -P `cat $pidfile`
 	echo $$ > "$pidfile"
-	trap "rm $pidfile" EXIT 
 }
 
 # Dependencies checking
 check_pid
 check_prog source-highlight 
 check_prog notify-send
+check_prog pkill
 test -f $log || die "Unable to read $log"
 
 # Main part
 tail -F -n0 $log | filter | marker | colorizer | sender $log
+
 
