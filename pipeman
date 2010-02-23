@@ -1,0 +1,52 @@
+#!/bin/sh
+
+die() {
+	echo $@ >&2
+	logger -i -t pipeman "error: $@"
+	exit 1
+}
+
+SDIR=$1
+test -d "$SDIR" || die "'$SDIR' is not a dir"
+FNAME=pipelets.update
+test -n "$FNAME" || die "FNAME should be non-empty"
+
+# Will generate function call for every input line
+awesomize() {
+	local sname=`basename "$1"`
+	echo "Will use '$sname' as callback key for $1" >&2
+	while read l ; do
+		echo "$FNAME ( \"$sname\" , \"$l\" )"
+	done
+}
+
+cleanup() {
+	for pid in $pids ; do 
+		pkill -P $pid 2>/dev/null
+	done
+}
+
+check_pid() {
+	local pidfile="$HOME/.runbashy.pid"
+	test -f "$pidfile" && kill `cat $pidfile`
+	echo $$ > "$pidfile"
+}
+
+check_prog() {
+	which "$1" >/dev/null 2>&1 || die "Please install $1"
+}
+
+check_prog pkill
+check_prog awesome-client
+check_pid
+
+trap cleanup "EXIT"
+for s in `find "$SDIR" -type f -and -executable` ; do
+	echo "Starting $s"
+	{ $s | awesomize "$s" | awesome-client ; } &
+	pids="$pids $!"
+done
+
+test -z "$pids" && die "Nothing to wait for"
+wait $pids
+

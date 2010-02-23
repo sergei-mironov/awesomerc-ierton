@@ -1,16 +1,17 @@
 #!/bin/sh
 
 supply() {
-	tail -n1 -F "/var/log/messages" | grep --line-buffered "mount"
+	echo "wakeup-and-sing"
+	tail -n0 -F "/var/log/messages" | grep --line-buffered "mount"
 }
 
 parse() {
-	mount | awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys' | grep -w -v /
+	awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys' | grep -w -v /
 }
 
-{ echo X ; supply ; } | while read x ; do
+supply | while read x ; do
 
-	parse | while read m ; do
+	for m in `mount | parse` ; do
 		printf "[%s] " `basename $m`
 	done
 
