@@ -1,21 +1,29 @@
 #!/bin/sh
 
-supply() {
-	echo "wakeup-and-sing"
-	tail -n0 -F "/var/log/messages" | grep --line-buffered "mount"
-}
-
 parse() {
 	awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys' | grep -w -v /
 }
 
-supply | while read x ; do
 
-	for m in `mount | parse` ; do
-		printf "[%s] " `basename $m`
+supply() {
+	exec tail -n0 -F "/var/log/messages" 
+}
+
+filter() {
+	echo "wake"
+	exec grep --line-buffered "mount"
+}
+
+process() {
+	while read x ; do
+		for m in `mount | parse` ; do
+			printf "[%s] " `basename $m`
+		done
+		echo
 	done
+}
 
-	echo
-
-done
+{ supply | filter | process ; } &
+trap "pkill -P $!" EXIT
+wait
 
