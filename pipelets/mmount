@@ -1,0 +1,20 @@
+#!/bin/sh
+
+supply() {
+	tail -n1 -F "/var/log/messages" | grep --line-buffered "mount"
+}
+
+parse() {
+	mount | awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys' | grep -w -v /
+}
+
+{ echo X ; supply ; } | while read x ; do
+
+	parse | while read m ; do
+		printf "[%s] " `basename $m`
+	done
+
+	echo
+
+done
+

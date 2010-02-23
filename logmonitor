@@ -37,7 +37,7 @@ securityIcon='/usr/share/icons/gnome/16x16/status/security-medium.png'
 outlang=$HOME/.config/awesome/themes/awesome.outlang
 
 filter_hide_pppd() { grep -w pppd | grep -qvE 'Welcome|Exit' ; }
-filter_hide_autofs() { grep -w automount | grep -qvE 'expired|mounted' ; }
+filter_hide_autofs() { grep -w automount ; }
 filter_hide_cron() { grep -w cron ; }
 filter_hide_pptp() { grep -w pptp ; }
 filter_hide_sudo() { grep -w sudo ; }

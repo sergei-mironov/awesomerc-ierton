@@ -7,7 +7,8 @@ require("freedesktop.utils")
 require("freedesktop.menu")
 
 require("tsave")
-require("bashets")
+--require("bashets")
+require("pipelets")
 
 require("myrc.mainmenu")
 require("myrc.tagman")
@@ -190,6 +191,9 @@ env = {
 	run = "gmrun"
 }
 
+-- Pipelets
+pipelets.config.script_path = awful.util.getdir("config").."/pipelets/"
+
 -- Naughty
 naughty_width = 700
 naughty.config.position = 'top_right'
@@ -230,8 +234,9 @@ myrc.tagman.init(myrc.memory.get("tagnames", "-", nil))
 
 myrc.logmon.init()
 
---awful.titlebar.button_groups.close_buttons.align = "right"
+pipelets.init()
 
+--awful.titlebar.button_groups.close_buttons.align = "right"
 -- }}}
 
 -- {{{ Wibox
@@ -251,6 +256,15 @@ mypromptbox = {}
 -- Clock
 mytextclock = {}
 mytextclock = awful.widget.textclock({align = "right"})
+pipelets.register_fmt(mytextclock, "date", " $1 ")
+
+-- Mountbox
+mymountbox = widget({ type = "textbox", align="right" })
+pipelets.register( mymountbox, "mmount")
+
+-- BatteryBox
+mybatbox = widget({ type = "textbox", align="right" })
+pipelets.register( mybatbox, "batmon")
 
 -- Layoutbox
 mylayoutbox = {}
@@ -300,14 +314,6 @@ mytasklist.buttons = awful.util.table.join(
 	end) 
 )
 
--- Bashets
-bashets.set_script_path(awful.util.getdir("config").."/bashets/")
-
-mybatmon = widget({ type = "textbox", name = "batmon", align="right" })
-bashets.register(mybatmon, "batmon.sh", '$1', 20)
-
-bashets.start()
-
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt({layout = awful.widget.layout.horizontal.leftright})
@@ -351,7 +357,8 @@ for s = 1, screen.count() do
     -- Create bottom wibox
     mybottom[s] = awful.wibox({ position = "bottom", screen = s, })
     mybottom[s].widgets = {
-		mybatmon,
+		mybatbox,
+		mymountbox,
 		layout = awful.widget.layout.horizontal.leftright
 	}
 
