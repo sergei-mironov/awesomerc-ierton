@@ -1,7 +1,7 @@
 #!/bin/sh
 
 parse() {
-	awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys' | grep -w -v /
+	awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys|/lib' | grep -w -v /
 }
 
 
