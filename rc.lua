@@ -255,7 +255,7 @@ mypromptbox = {}
 
 -- Clock
 mytextclock = {}
-mytextclock = awful.widget.textclock({align = "right"})
+mytextclock = widget({ type = "textbox", align="right" })
 pipelets.register_fmt(mytextclock, "date", " $1 ")
 
 -- Mountbox
