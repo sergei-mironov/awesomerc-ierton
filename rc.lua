@@ -384,13 +384,19 @@ function switch_to_client(direction)
 	if client.focus then client.focus:raise() end
 end
 
-function switch_to_tag(name)
-	local t = myrc.tagman.find(name)
-	if t == nil then
-		naughty.notify({text = "Can't find tag with name '" .. name .. "'"})
-		return
+-- Toggle tags between current and one, that has name 'name'
+function toggle_tag(name)
+	local this = awful.tag.selected()
+	if this.name == name then
+		awful.tag.history.restore()
+	else
+		local t = myrc.tagman.find(name)
+		if t == nil then
+			naughty.notify({text = "Can't find tag with name '" .. name .. "'"})
+			return
+		end
+		awful.tag.viewonly(t)
 	end
-	awful.tag.viewonly(t)
 end
 
 -- Bind keyboard digits
@@ -404,15 +410,15 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey, "Control" }, "r", function() 
 		mypromptbox[mouse.screen].widget.text = awful.util.escape(awful.util.restart())
 	end),
-    awful.key({ modkey },            "r", function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey            }, "r", function () mypromptbox[mouse.screen]:run() end),
 	awful.key({ modkey, "Control" }, "q", awesome.quit),
 
 	-- Tag hotkeys
-	awful.key({ modkey, "Control" }, "m", function () switch_to_tag("im") end),
-	awful.key({ modkey, "Control" }, "w", function () switch_to_tag("work") end),
-	awful.key({ modkey, "Control" }, "n", function () switch_to_tag("net") end),
-	awful.key({ modkey, "Control" }, "f", function () switch_to_tag("fun") end),
-	awful.key({ modkey, "Control" }, "e", function () switch_to_tag("sys") end),
+	awful.key({ modkey, "Control" }, "m", function () toggle_tag("im") end),
+	awful.key({ modkey, "Control" }, "w", function () toggle_tag("work") end),
+	awful.key({ modkey, "Control" }, "n", function () toggle_tag("net") end),
+	awful.key({ modkey, "Control" }, "f", function () toggle_tag("fun") end),
+	awful.key({ modkey, "Control" }, "e", function () toggle_tag("sys") end),
 	awful.key({ modkey            }, "Tab", function() awful.tag.history.restore() end),
 
 	-- Client manipulation
@@ -438,7 +444,7 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
 	-- Tagset operations (Win+Ctrl+s,<letter> chords)
-	awful.key({ modkey, "Control"   }, "s", function () 
+	awful.key({ modkey, "Control" }, "s", function () 
 		myrc.keybind.push({
 			myrc.keybind.key({}, "Escape", "Cancel", function () 
 				myrc.keybind.pop() 
