@@ -2,6 +2,7 @@ local awful = require("awful")
 local beautiful = require("beautiful")
 local freedesktop_utils = require("freedesktop.utils")
 local freedesktop_menu = require("freedesktop.menu")
+local naughty = require("naughty")
 
 local io = io
 local table = table
@@ -20,11 +21,12 @@ function menu()
 	local cmd = "find -L " .. themespath .. " -name 'theme.lua' -and -not -path '*.current*'"
 	local f = io.popen(cmd)
 	for l in f:lines() do
-		local item = { string.gsub(l,"[%w/._-]+/([%w-_]+)/theme.lua", "%1"),
+		local folder = string.gsub(l,"[%w/._-]+/([%w-_]+)/theme.lua", "%1")
+		local item = { folder,
 		function () 
 			local themepath = string.gsub(l,"(%w+)/theme.lua", "%1")
 			os.execute("rm -f " .. themespath .. "/.current")
-			os.execute("ln -s " .. l .. " " .. themespath .. "/.current")
+			os.execute("ln -s " .. folder .. " " .. themespath .. "/.current")
 			awesome.restart()
 		end }
 		table.insert(mythememenu, item)
@@ -35,7 +37,7 @@ function menu()
 end
 
 function current()
-    local filename = awful.util.getdir("config") .. "/themes/.current"
+    local filename = awful.util.getdir("config") .. "/themes/.current/theme.lua"
     local handle = io.open(filename)
     if handle == nil then
         return awful.util.getdir("config") .. "/themes/blue-black-red/theme.lua"
