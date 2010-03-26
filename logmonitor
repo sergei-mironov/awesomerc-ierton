@@ -129,7 +129,6 @@ check_pid() {
 
 # Dependencies checking
 check_pid
-check_prog source-highlight 
 check_prog notify-send
 check_prog pkill
 test -f $log || die "Unable to read $log"
