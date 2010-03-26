@@ -195,11 +195,15 @@ env = {
 pipelets.config.script_path = awful.util.getdir("config").."/pipelets/"
 
 -- Naughty
-naughty_width = 700
+naughty.config.presets.keybind = {
+    position = 'top_left',
+    timeout = 0,
+}
+logmon_width = 700
 naughty.config.position = 'top_right'
-naughty.config.presets.low.width = naughty_width
-naughty.config.presets.normal.width = naughty_width
-naughty.config.presets.critical.width = naughty_width
+naughty.config.presets.low.width = logmon_width
+naughty.config.presets.normal.width = logmon_width
+naughty.config.presets.critical.width = logmon_width
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts = 
@@ -447,7 +451,7 @@ globalkeys = awful.util.table.join(
 
 	-- Tagset operations (Win+Ctrl+s,<letter> chords)
 	awful.key({ modkey, "Control" }, "s", function () 
-		myrc.keybind.push({
+		myrc.keybind.push("Tags action", {
 			myrc.keybind.key({}, "Escape", "Cancel", function () 
 				myrc.keybind.pop() 
 			end),
@@ -493,7 +497,7 @@ globalkeys = awful.util.table.join(
 			myrc.keybind.key({}, "j", "Move tag left", function () 
 				myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(-2))
 			end)
-		}, "Tags action") 
+		}) 
 	end)
 )
 
@@ -521,40 +525,40 @@ clientkeys = awful.util.table.join(
 
     awful.key({ altkey }, "`", function(c) build_client_menu(c, true) end),
     awful.key({ modkey , "Ctrl" }, "d", function(c) 
-        myrc.keybind.push_client( {
+        myrc.keybind.push ( "Change '" .. c.name .. "' settings", {
             myrc.keybind.key({}, "Escape", "Cancel", function (c) 
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "f", "Toggle floating", function (c) 
                 save_floating(c, not awful.client.floating.get(c))
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "c", "Set centered on", function (c) 
                 save_centered(c, true)
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({"Shift"}, "c", "Set centered off", function (c) 
                 save_centered(c, false)
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "t", "Toggle titlebar", function (c) 
                 save_titlebar(c, not get_titlebar(c, false)) 
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "g", "Save geometry", function (c) 
                 save_geometry(c, get_geometry(c))
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "s", "Toggle fullscreen", function (c) 
                 c.maximized_horizontal = not c.maximized_horizontal
                 c.maximized_vertical   = not c.maximized_vertical
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "r", "Rename", function (c) 
@@ -564,22 +568,22 @@ clientkeys = awful.util.table.join(
                     function(n) awful.client.property.set(c,"name", n) end,
                     awful.completion.bash,
                     awful.util.getdir("cache") .. "/rename")
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end),
 
             myrc.keybind.key({}, "d", "Stick to this tag", function (c) 
 				local t = awful.tag.selected()
                 save_tag(c, t) 
 				naughty.notify({text = "Client " .. c.name .. " was bound to tag " .. t.name}) 
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end), 
 
             myrc.keybind.key({"Shift"}, "d", "Unbound from any tag", function (c) 
                 save_tag(c, nil) 
 				naughty.notify({text = "Client " .. c.name .. " was unbound from tag"}) 
-                myrc.keybind.pop_client(c) 
+                myrc.keybind.pop(c) 
             end)
-        } , "Change '" .. c.name .. "' settings", c) 
+        }, c) 
     end)
 )
 
