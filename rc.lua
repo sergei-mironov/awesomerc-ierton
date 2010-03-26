@@ -7,7 +7,6 @@ require("freedesktop.utils")
 require("freedesktop.menu")
 
 require("tsave")
---require("bashets")
 require("pipelets")
 
 require("myrc.mainmenu")
@@ -242,8 +241,10 @@ pipelets.init()
 -- {{{ Wibox
 -- Empty launcher
 mymainmenu = myrc.mainmenu.build()
-mylauncher = awful.widget.launcher({ 
-	image = beautiful.awesome_icon, menu = mymainmenu })
+mylauncher = awful.widget.button({image = beautiful.awesome_icon})
+-- Main menu will be placed at left top corner of screen
+mylauncher:buttons(awful.util.table.join(mylauncher:buttons(), 
+    awful.button({}, 1, nil, function () myrc.mainmenu.show(mymainmenu,false) end)))
 
 -- Create a systray
 mysystray = widget({ type = "systray" })
@@ -318,8 +319,8 @@ for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt({layout = awful.widget.layout.horizontal.leftright})
 
-    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
+    -- Create an imagebox widget which will contains an icon indicating
+    -- which layout we're using. We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
     mylayoutbox[s]:buttons(mylayoutbox.buttons)
 
@@ -406,7 +407,7 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
 	awful.key({ modkey            }, "i", function () awful.util.spawn(env.im) end),
 	awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
-	awful.key({ altkey            }, "Escape", function() myrc.mainmenu.show_at(mymainmenu,true) end),
+	awful.key({ altkey            }, "Escape", function() myrc.mainmenu.show(mymainmenu,true) end),
 	awful.key({ modkey, "Control" }, "r", function() 
 		mypromptbox[mouse.screen].widget.text = awful.util.escape(awful.util.restart())
 	end),
@@ -592,15 +593,11 @@ clientbuttons = awful.util.table.join(
 -- Hook function to execute when focusing a client.
 client.add_signal("focus", function (c)
 	c.border_color = beautiful.border_focus
-	if mymainmenu then awful.menu.hide(mymainmenu) end
-	if mycontextmenu then awful.menu.hide(mycontextmenu) end
 end)
 
 -- Hook function to execute when unfocusing a client.
 client.add_signal("unfocus", function (c)
 	c.border_color = beautiful.border_normal
-	if mymainmenu then awful.menu.hide(mymainmenu) end
-	if mycontextmenu then awful.menu.hide(mycontextmenu) end
 end)
 
 -- Hook function to execute when a new client appears.
@@ -641,6 +638,16 @@ client.add_signal("manage", function (c, startup)
 	if not c.icon and theme.default_client_icon then
 		c.icon = image(theme.default_client_icon)
 	end
+
+    -- Enable sloppy focus
+    c:add_signal("mouse::enter", function(c)
+        if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+            and awful.client.focus.filter(c) then
+            client.focus = c
+        end
+        if mymainmenu then awful.menu.hide(mymainmenu) end
+        if mycontextmenu then awful.menu.hide(mycontextmenu) end
+    end)
 
     -- New client may not receive focus
     -- if they're not focusable, so set border anyway.
