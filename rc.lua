@@ -177,17 +177,18 @@ altkey = "Mod1"
 
 -- Helper variables
 env = {
-	browser = "firefox ",
-	man = "xterm -e man ",
-	terminal = "xterm ", 
-	screen = "xterm -e screen",
-	terminal_root = "xterm -e su -c screen",
-	im = "pidgin ",
-	editor = os.getenv("EDITOR") or "xterm -e vim ",
-	home_dir = os.getenv("HOME"),
-	music_show = "gmpc --replace",
-	music_hide = "gmpc --quit",
-	run = "gmrun"
+    browser = "firefox ",
+    man = "xterm -e man ",
+    terminal = "xterm ", 
+    screen = "xterm -e screen",
+    terminal_root = "xterm -e su -c screen",
+    im = "pidgin ",
+    editor = os.getenv("EDITOR") or "xterm -e vim ",
+    home_dir = os.getenv("HOME"),
+    music_show = "gmpc --replace",
+    music_hide = "gmpc --quit",
+    run = "gmrun",
+    locker="xlock"
 }
 
 -- Pipelets
@@ -407,6 +408,7 @@ globalkeys = awful.util.table.join(
 	awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
 	awful.key({ modkey            }, "i", function () awful.util.spawn(env.im) end),
 	awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
+    awful.key({ modkey            }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
 	awful.key({ altkey            }, "Escape", function() myrc.mainmenu.show(mymainmenu,true) end),
 	awful.key({ modkey, "Control" }, "r", function() 
 		mypromptbox[mouse.screen].widget.text = awful.util.escape(awful.util.restart())
@@ -645,8 +647,12 @@ client.add_signal("manage", function (c, startup)
             and awful.client.focus.filter(c) then
             client.focus = c
         end
-        if mymainmenu then awful.menu.hide(mymainmenu) end
-        if mycontextmenu then awful.menu.hide(mycontextmenu) end
+
+        function kill_mousemode_menu(m) 
+            if m and (true ~= m.keygrabber) then awful.menu.hide(m) end 
+        end
+        kill_mousemode_menu(mymainmenu)
+        kill_mousemode_menu(mycontextmenu)
     end)
 
     -- New client may not receive focus
