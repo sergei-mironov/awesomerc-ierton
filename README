@@ -1,5 +1,4 @@
 Hello. You are reading Sergey (ierton) Mironov's config readme.
-I hope you'll find my work usefull.
 
 DIRECTORY STRUCTURE
 ===================
@@ -19,6 +18,7 @@ The directory structure of config:
 |   `-- themes.lua
 |-- rc.lua                     		This is main config
 |-- table.save-0.94.lua
+|-- pipelets.lua                    Piplets library
 |-- themes                          Theme collection
 |   |-- blue-black-red              My current theme files are here
 |   |   |-- theme.lua               My current theme config
@@ -27,11 +27,26 @@ The directory structure of config:
 |   |                               Default theme
 |   `-- sky -> /usr/share/awesome/themes/sky
 |                                   Another default theme
+|-- pipelets
+|   |-- date                        Russian-language date pipelet
+|   |-- mmount                      Mount info pipelet
+|   `-- batmon                      Battery info pipelet
 |-- tsave.lua -> table.save-0.94.lua
 |                                   Main thing for registry to work
 `-- wallpapers                      Wallpaper collection
     `-- vladstudio-1.jpg
 
+PIPELETS
+========
+
+This config uses pipelets to post some information into widgets.
+pipelet is a program (sh script), which is "conected" 
+with widget via pipe. 
+
+All plumbery is hidden in pipeman script. It translates stdout
+of its children into awesome calls.
+
+See rc.lua for details.
 
 
 DEFAULT KEYBINDINGS
@@ -39,25 +54,27 @@ DEFAULT KEYBINDINGS
 
 Here are some default bindings:
 
-==== Client keys:
+Client keys
+-----------
 
 altkey+` - show client context menu
 Ctrl+modkey+d - start client settings chord
 Ctrl+modkey+d,c - Center client
-Ctrl+modkey+d,f - Set client to be floating
-Ctrl+modkey+d,F - Remove floating
+Ctrl+modkey+d,l - Toggle client to be floating
+Ctrl+modkey+d,d - Rename a client (set new title)
 and so on (read tooltip)
 
 altkey+1 - prev client
 altkey+2 - next client
 altkey+tab - toggle last 2 active clients
 
-==== Tag keys:
+Tag keys
+--------
 
 altkey+F1 - jump to one tag left
 altkey+F2 - jump to one tag right
-modkey+F1 - move current clinet one tag left
-modkey+F2 - move current clinet one tag right
+modkey+F1 - move focused client one tag left
+modkey+F2 - move focused client one tag right
 modkey+tab - switch to previous tag
 
 Crtl+modkey+s - begin tag manipulation chord (tooltip will appear)
@@ -66,19 +83,26 @@ Crtl+modkey+s,c - create a tag
 Crtl+modkey+s,d - delete current tag
 and so on
 
-==== Menus:
+Menus
+-----
 
 altkey+Esc - show main menu
 altkey+` - show client menu
 
-There are vim keybindings defained in menus (hjkl - move, o - open, Enter - open)
+There are vim keybindings defined for menus 
+(hjkl - move, o - open, x - back, Enter - open)
 
-Mail bugs to ierton@gmail.com.
+Mail bugs/patches to ierton@gmail.com.
 
-TODO: Implemet M$Windows alt+tab functionality (don't know how to capture
-altkey release event)
-TODO: Implement client renaming
-TODO: Fix menu non-dissapearing
-TODO: Rewrite keybind.lua
+
+TODO 
+====
+
+*) Add client reordering
+*) Add google/wiki search bar
+*) Add mpd controls
+*) Implement M$Windows alt+tab functionality (don't know how to 
+capture altkey release event)
 
 Sergey.
+
