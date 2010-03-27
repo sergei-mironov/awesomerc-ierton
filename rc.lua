@@ -527,61 +527,61 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey , "Ctrl" }, "d", function(c) 
         myrc.keybind.push ( "Change '" .. c.name .. "' settings", {
             myrc.keybind.key({}, "Escape", "Cancel", function (c) 
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
-            myrc.keybind.key({}, "f", "Toggle floating", function (c) 
+            myrc.keybind.key({}, "l", "Toggle floating", function (c) 
                 save_floating(c, not awful.client.floating.get(c))
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
             myrc.keybind.key({}, "c", "Set centered on", function (c) 
                 save_centered(c, true)
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
             myrc.keybind.key({"Shift"}, "c", "Set centered off", function (c) 
                 save_centered(c, false)
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
             myrc.keybind.key({}, "t", "Toggle titlebar", function (c) 
                 save_titlebar(c, not get_titlebar(c, false)) 
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
             myrc.keybind.key({}, "g", "Save geometry", function (c) 
                 save_geometry(c, get_geometry(c))
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
-            myrc.keybind.key({}, "s", "Toggle fullscreen", function (c) 
+            myrc.keybind.key({}, "f", "Toggle fullscreen", function (c) 
                 c.maximized_horizontal = not c.maximized_horizontal
                 c.maximized_vertical   = not c.maximized_vertical
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
-            myrc.keybind.key({}, "r", "Rename", function (c) 
+            myrc.keybind.key({}, "d", "Rename", function (c) 
                 awful.prompt.run(
                     { prompt = "Rename client: " }, 
                     mypromptbox[mouse.screen].widget, 
                     function(n) awful.client.property.set(c,"name", n) end,
                     awful.completion.bash,
                     awful.util.getdir("cache") .. "/rename")
-                myrc.keybind.pop(c) 
+                myrc.keybind.pop() 
             end),
 
-            myrc.keybind.key({}, "d", "Stick to this tag", function (c) 
+            myrc.keybind.key({}, "s", "Stick to this tag", function (c) 
 				local t = awful.tag.selected()
                 save_tag(c, t) 
-				naughty.notify({text = "Client " .. c.name .. " was bound to tag " .. t.name}) 
-                myrc.keybind.pop(c) 
+				naughty.notify({text = "Client " .. c.name .. " has been sticked to tag " .. t.name}) 
+                myrc.keybind.pop() 
             end), 
 
-            myrc.keybind.key({"Shift"}, "d", "Unbound from any tag", function (c) 
+            myrc.keybind.key({"Shift"}, "s", "Unstick from any tag", function (c) 
                 save_tag(c, nil) 
-				naughty.notify({text = "Client " .. c.name .. " was unbound from tag"}) 
-                myrc.keybind.pop(c) 
+				naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
+                myrc.keybind.pop() 
             end)
         }, c) 
     end)

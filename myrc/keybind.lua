@@ -99,7 +99,7 @@ local function remove_a_key(k, tbl)
     dbg("Can't find a key: " .. k.keysym)
 end
 
-local function chord_release(ch, ref_client)
+local function chord_release(ch)
     local allkeys = get_keys(ch.client)
     for _,n in ipairs(ch.keytable) do
         remove_a_key(n,allkeys)
@@ -135,9 +135,9 @@ function push(title, keytable, c, preset)
 end
 
 -- Cancels current chord, if any
-function pop(c)
+function pop()
     if the_chord ~= nil then
-        chord_release(the_chord, c)
+        chord_release(the_chord)
         the_chord = nil
     end
 end
