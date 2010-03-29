@@ -670,15 +670,12 @@ client.add_signal("manage", function (c, startup)
     client.focus = c
 end)
 
+-- Signal from tagman lib. 
+-- Handler will store tag names to registry.
+-- Those names will be used at next awesome start
+-- to recreate current tags.
 awesome.add_signal("tagman::update", function (t) 
-    local n = myrc.tagman.names()
-    if t == nil then dbg({"NIL"}) end
-    if #n ~= 0 then
-        dbg(n)
-        myrc.memory.set("tagnames","-", n)
-    else
-        dbg({"#n is 0!"})
-    end
+    myrc.memory.set("tagnames","-", myrc.tagman.names())
 end)
 
 

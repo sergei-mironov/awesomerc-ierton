@@ -27,8 +27,6 @@ local tostring = tostring
 
 module("myrc.tagman")
 
-tags = {}
-
 -- Returns tag by name
 function find(name,s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
@@ -106,8 +104,9 @@ function move(tag, where, s)
 		table.insert(stags,index,tag)
 	end
 	capi.screen[s]:tags(stags)
-	capi.client.focus = c
+    -- Awesome BUG(?): Signal will be lost if one swap next two lines
 	awesome.emit_signal("tagman::update", tag)
+	capi.client.focus = c
 end
 
 -- Adds a tag named @tn with props @props
@@ -120,7 +119,7 @@ function add(tn, props, s)
 	awful.layout.set(props.layout or awful.layout.suit.max, tag)
 	if props.setsel == true then tag.selected = true end
 	awesome.emit_signal("tagman::update", tag)
-	return t
+	return tag
 end
 
 -- Removes tag @tag. Move @tag's clients to another tag
@@ -153,8 +152,6 @@ function init(namelist)
 
 	for s = 1, capi.screen.count() do
 		-- Each screen has its own tag table.
-		tags[s] = {}
-
 		for i, name in ipairs(namelist) do 
 			add(name, { setsel=(i==1) } ) 
 		end
