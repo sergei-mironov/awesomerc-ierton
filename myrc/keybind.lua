@@ -1,9 +1,8 @@
--- Author: Sergey Mironov ierton/at/gmail.com
+-- Author: Sergey Mironov ierton@gmail.com
+-- License: BSD3
 -- 2009-2010
--- License: BSD
 --
--- Library allows user to bind a 'chords'
--- like GNU Screen does.
+-- Library allows user to bind GNU Screen style 'chords'
 
 local awful = require("awful")
 local naughty = require("naughty")

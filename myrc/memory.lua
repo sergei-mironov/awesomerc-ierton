@@ -1,7 +1,11 @@
+-- Author: Sergey Mironov ierton@gmail.com
+-- License: BSD3
+-- 2009-2010
+--
+-- Registry support
+-- Note: library requires table.save lua lib
+
 local awful = require("awful")
---local beautiful = require("beautiful")
---local freedesktop_utils = require("freedesktop.utils")
---local freedesktop_menu = require("freedesktop.menu")
 
 local io = io
 local table = table
