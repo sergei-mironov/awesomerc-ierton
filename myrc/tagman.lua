@@ -110,7 +110,7 @@ function move(tag, where, s)
 	awesome.emit_signal("tagman::update", tag)
 end
 
--- Adds a tag names @tn with props @props
+-- Adds a tag named @tn with props @props
 function add(tn, props, s)
 	local props = props or {}
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
@@ -123,7 +123,7 @@ function add(tn, props, s)
 	return t
 end
 
--- Removes tag @tag. Move @tag's client to another tag
+-- Removes tag @tag. Move @tag's clients to another tag
 function del(tag, s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
@@ -136,7 +136,7 @@ function del(tag, s)
 	handle_orphans(s, awful.tag.selected(s))
 end
 
--- Renames tag @tag into new name
+-- Renames tag @tag with name @newname
 function rename(tag, newname, s)
 	tag.name = newname
 	awesome.emit_signal("tagman::update", tag)
