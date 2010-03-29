@@ -1,4 +1,4 @@
-Hello. You are reading Sergey (ierton) Mironov's config readme.
+Hi! This project grows from my attempt to setup awesome.
 
 DIRECTORY STRUCTURE
 ===================
@@ -102,7 +102,11 @@ TODO
 *) Add google/wiki search bar
 *) Add mpd controls
 *) Implement M$Windows alt+tab functionality (don't know how to 
-capture altkey release event)
+   capture altkey release event)
+*) Add some online translator support
 
+--
+Thanks for your interest! 
+Mail bugs and questions to ierton@gmail.com
 Sergey.
 
