@@ -1,5 +1,6 @@
 -- Include awesome libraries, with lots of useful function!
 require("awful")
+require("awesome")
 require("awful.autofocus")
 require("beautiful")
 require("naughty")
@@ -632,6 +633,7 @@ client.add_signal("manage", function (c, startup)
 
 	local tag = get_tag(c, nil)
 	if tag ~= nil then
+        naughty.notify({text = "Moving " .. c.name .. " to assiciated tag " .. t.name}) 
 		awful.client.movetotag(tag,c)
 	end
 
@@ -668,8 +670,15 @@ client.add_signal("manage", function (c, startup)
     client.focus = c
 end)
 
-awful.tag.attached_add_signal(nil, "tagman::update", function (t) 
-	myrc.memory.set("tagnames","-", myrc.tagman.names())
+awesome.add_signal("tagman::update", function (t) 
+    local n = myrc.tagman.names()
+    if t == nil then dbg({"NIL"}) end
+    if #n ~= 0 then
+        dbg(n)
+        myrc.memory.set("tagnames","-", n)
+    else
+        dbg({"#n is 0!"})
+    end
 end)
 
 

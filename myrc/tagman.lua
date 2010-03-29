@@ -1,3 +1,10 @@
+-- Author: Sergey Mironov ierton@gmail.com
+-- License: BSD3
+-- 2009-2010
+--
+-- Tag manipulation library
+-- Note: library uses signal "tagman::update"
+
 local awful = require("awful")
 local beautiful = require("beautiful")
 
@@ -6,7 +13,8 @@ local capi = {
 	screen = screen,
 	tag = tag,
 	mouse = mouse,
-	client = client
+	client = client,
+    awesome = awesome
 }
 
 local client = client
@@ -21,34 +29,34 @@ module("myrc.tagman")
 
 tags = {}
 
--- returns tag by name
-function find(name)
+-- Returns tag by name
+function find(name,s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
-	return tags[s][name]
+	for _,t in ipairs(capi.screen[s]:tags()) do 
+        if name == t.name then return t end 
+    end
+	return nil
 end
 
--- returns list of tag names
-function names()
+-- Returns list of tag names at screen @s
+function names(s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
-	local stags = capi.screen[s]:tags()
 	local result = {}
-	for _,tag in ipairs(stags) do table.insert(result, tag.name) end
+	for _,t in ipairs(capi.screen[s]:tags()) do 
+        table.insert(result, t.name) 
+    end
 	return result
 end
 
--- returns tag by index
+-- Returns tag by index @index, starting from 0.
 function get(index, s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
     return stags[awful.util.cycle(#stags, index)]
 end
 
--- offset : offset from base tag (+n , -n , 0)
--- basetag : see code :)
--- s - screen
---
--- returns tag object, which can be passed to functions like 
--- awful.client.movetotag()
+-- Gets tag object, by its offset @offset, starting from 
+-- tag @basetag
 function getn(offset, basetag, s)
 	local offset = offset or 0
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
@@ -58,7 +66,7 @@ function getn(offset, basetag, s)
     return stags[awful.util.cycle(#stags, k + offset)]
 end
 
-function handle_orphans(s, deftag)
+local function handle_orphans(s, deftag)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
 	if #stags < 1 then return end
@@ -69,6 +77,7 @@ function handle_orphans(s, deftag)
     end
 end
 
+-- Does what?
 function sort(s, fn)
 	local fn = fn or function (a, b) return a.name < b.name end
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
@@ -77,8 +86,8 @@ function sort(s, fn)
     capi.screen[s]:tags(all_tags)
 end
 
--- moves tag to position #where (if where is number) -OR- next 
--- to tag where (if where is object)
+-- Moves tag to position @where (if where is number) -OR- next
+-- to tag @where (if where is object)
 function move(tag, where, s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
@@ -98,45 +107,46 @@ function move(tag, where, s)
 	end
 	capi.screen[s]:tags(stags)
 	capi.client.focus = c
-	tag:emit_signal("tagman::update", tag)
+	awesome.emit_signal("tagman::update", tag)
 end
 
+-- Adds a tag names @tn with props @props
 function add(tn, props, s)
 	local props = props or {}
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
-	local tn = tostring(tn)
-	local t = capi.tag {name = tn}
-	t.screen = s
-	awful.layout.set(props.layout or awful.layout.suit.max, t)
-	tags[s][tn] = t
-	if props.setsel == true then t.selected = true end
-	t:emit_signal("tagman::update", t)
+	local tname = tostring(tn)
+	local tag = capi.tag {name = tname}
+	tag.screen = s
+	awful.layout.set(props.layout or awful.layout.suit.max, tag)
+	if props.setsel == true then tag.selected = true end
+	awesome.emit_signal("tagman::update", tag)
 	return t
 end
 
+-- Removes tag @tag. Move @tag's client to another tag
 function del(tag, s)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
 	if #stags <= 1 then return end
 	if tag == stags[1] then awful.tag.viewnext() else awful.tag.viewprev() end
-	tag:emit_signal("tagman::update", tag)
-	tags[s][tag.name] = nil
 	tag.screen = nil
-	--FIXME: When there were 2 tags before del(), clients are dissapearing 
+	awesome.emit_signal("tagman::update", tag)
+	--FIXME: When there were 2 tags, clients are dissapearing 
 	--insted of jumping to the last tag.
 	handle_orphans(s, awful.tag.selected(s))
 end
 
+-- Renames tag @tag into new name
 function rename(tag, newname, s)
-	local s = s or client.focus and client.focus.screen or capi.mouse.screen
-	tags[s][tag.name] = nil
 	tag.name = newname
-	tags[s][tag.name] = tag
-	tag:emit_signal("tagman::update", tag)
+	awesome.emit_signal("tagman::update", tag)
 end
 
+-- Initializes the library. 
+-- Creates tags with names from @namelist table
+-- If @namelist is empty, creates tags 1..9
 function init(namelist)
-	if namelist == nil then
+	if namelist == nil or #namelist == 0 then
 		namelist = {}
 		for i=1,9 do namelist[i] = tostring(i) end
 	end
