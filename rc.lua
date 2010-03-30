@@ -466,18 +466,23 @@ end
 -- Bind keyboard digits
 globalkeys = awful.util.table.join(
 
-    -- Application hotkeys
-    awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
-    awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
-    awful.key({ modkey            }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
+    -- Main menu
     awful.key({ altkey            }, "Escape", function() myrc.mainmenu.show(mymainmenu,true) end),
-    awful.key({ modkey            }, "r", function () mypromptbox[mouse.screen]:run() end),
-    awful.key({ modkey,           }, "m", function () run_or_raise("gmpc", { class = "Gmpc" }) end),
-    awful.key({ modkey            }, "p", function () run_or_raise("pidgin", { class = "Pidgin" }) end),
+
+    -- Awesome control
     awful.key({ modkey, "Control" }, "q", awesome.quit),
     awful.key({ modkey, "Control" }, "r", function() 
         mypromptbox[mouse.screen].widget.text = awful.util.escape(awful.util.restart())
     end),
+
+    -- Application hotkeys
+    awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
+    awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
+    awful.key({ modkey            }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
+    awful.key({ modkey            }, "r", function () mypromptbox[mouse.screen]:run() end),
+    awful.key({ modkey,           }, "m", function () run_or_raise("gmpc", { class = "Gmpc" }) end),
+    awful.key({ modkey            }, "p", function () awful.util.spawn("pidgin") end),
+    awful.key({ modkey            }, "c", function () run_or_raise("xterm -e calc", { class="XTerm", name = "calc" }) end),
 
     -- Tag hotkeys
     awful.key({ modkey, "Control" }, "m", function () toggle_tag("im") end),
@@ -495,7 +500,6 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(1) end),
     awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx(-1) end),
     awful.key({ altkey            }, "Tab", function() switch_to_client(0) end),
-    awful.key({ modkey, "Control" }, "i", function () dbg_client(client.focus) end),
 
     -- Layout manipulation
     awful.key({ altkey,           }, "F1", awful.tag.viewprev ),
@@ -510,7 +514,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
     -- MPD commands
-    awful.key({ modkey,           }, "w", function () 
+    awful.key({ altkey,           }, "e", function () 
         myrc.keybind.push("::MPD::", {
             myrc.keybind.key({}, "Escape", "Cancel", function () 
                 myrc.keybind.pop() 
@@ -547,7 +551,7 @@ globalkeys = awful.util.table.join(
     end),
 
     -- Tagset operations (Win+Ctrl+s,<letter> chords)
-    awful.key({ modkey,           }, "s", function () 
+    awful.key({ altkey,           }, "F3", function () 
         myrc.keybind.push("::Tags::", {
             myrc.keybind.key({}, "Escape", "Cancel", function () 
                 myrc.keybind.pop() 
@@ -557,7 +561,7 @@ globalkeys = awful.util.table.join(
                 myrc.keybind.pop() 
             end),
 
-            myrc.keybind.key({}, "s", "Rename current tag", function () 
+            myrc.keybind.key({}, "r", "Rename current tag", function () 
                 awful.prompt.run(
                 { prompt = "Rename this tag: " }, 
                 mypromptbox[mouse.screen].widget, 
@@ -619,10 +623,12 @@ clientkeys = awful.util.table.join(
         c.maximized_vertical   = not c.maximized_vertical
     end),
 
-    awful.key({ altkey }, "`", function(c) build_client_menu(c, true) end),
+    awful.key({ altkey }, "F6", function (c) 
+        dbg_client(c) 
+    end),
 
     -- Client keys
-    awful.key({ modkey ,        }, "d", function(c) 
+    awful.key({ altkey ,        }, "3", function(c) 
         myrc.keybind.push ( "::Client::", {
             myrc.keybind.key({}, "Escape", "Cancel", function (c) 
                 myrc.keybind.pop() 
@@ -659,7 +665,7 @@ clientkeys = awful.util.table.join(
                 myrc.keybind.pop() 
             end),
 
-            myrc.keybind.key({}, "d", "Rename", function (c) 
+            myrc.keybind.key({}, "r", "Rename", function (c) 
                 awful.prompt.run(
                 { prompt = "Rename client: " }, 
                 mypromptbox[mouse.screen].widget, 
