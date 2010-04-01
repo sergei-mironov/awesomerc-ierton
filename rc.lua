@@ -190,7 +190,7 @@ env = {
     music_show = "gmpc --replace",
     music_hide = "gmpc --quit",
     run = "gmrun",
-    locker="xlock"
+    locker = "xscreensaver-command -lock"
 }
 
 -- Pipelets
@@ -478,7 +478,7 @@ globalkeys = awful.util.table.join(
     -- Application hotkeys
     awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
     awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
-    awful.key({ modkey            }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
+    awful.key({                   }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
     awful.key({ modkey            }, "r", function () mypromptbox[mouse.screen]:run() end),
     awful.key({ modkey,           }, "m", function () run_or_raise("gmpc", { class = "Gmpc" }) end),
     awful.key({ modkey            }, "p", function () awful.util.spawn("pidgin") end),
