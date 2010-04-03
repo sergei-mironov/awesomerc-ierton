@@ -753,12 +753,12 @@ client.add_signal("manage", function (c, startup)
         c.icon = image(theme.default_client_icon)
     end
 
-    -- Enable sloppy focus
     c:add_signal("mouse::enter", function(c)
-        if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-            and awful.client.focus.filter(c) then
-            client.focus = c
-        end
+        -- Enable sloppy focus
+        -- if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+        --     and awful.client.focus.filter(c) then
+        --     client.focus = c
+        -- end
 
         function kill_mousemode_menu(m) 
             if m and (true ~= m.keygrabber) then awful.menu.hide(m) end 
