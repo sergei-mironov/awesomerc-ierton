@@ -59,6 +59,11 @@ end
 function save_floating(c, f)
 	myrc.memory.set("floating", client_name(c), f)
 	awful.client.floating.set(c, f)
+    if f == true then
+        c.border_width = beautiful.border_width
+    else
+        c.border_width = 0
+    end
 	return f
 end
 
@@ -152,6 +157,23 @@ naughty.config.position = 'top_right'
 naughty.config.presets.low.width = logmon_width
 naughty.config.presets.normal.width = logmon_width
 naughty.config.presets.critical.width = logmon_width
+
+-- Popup menus
+
+popups = {
+--    fg_focus
+--    bg_focus
+--    fg_normal
+--    bg_normal
+
+--    submenu_icon
+
+    height = 10,
+--    width
+
+--    border_color = 
+--    border_width
+}
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts = 
@@ -703,12 +725,6 @@ client.add_signal("manage", function (c, startup)
     end
 
     c:add_signal("mouse::enter", function(c)
-        -- Enable sloppy focus
-        -- if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-        --     and awful.client.focus.filter(c) then
-        --     client.focus = c
-        -- end
-
         function kill_mousemode_menu(m) 
             if m and (true ~= m.keygrabber) then awful.menu.hide(m) end 
         end
@@ -718,11 +734,9 @@ client.add_signal("manage", function (c, startup)
 
     -- New client may not receive focus
     -- if they're not focusable, so set border anyway.
-    c.border_width = beautiful.border_width
     c.border_color = beautiful.border_normal
     c.size_hints_honor = false
 
-    -- Do this after tag mapping, so you don't see it on the wrong tag for a split second.
     client.focus = c
 end)
 

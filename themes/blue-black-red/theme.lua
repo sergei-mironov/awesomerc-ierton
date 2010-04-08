@@ -7,7 +7,6 @@ theme.name = "blue-black-red"
 theme.config = awful.util.getdir("config")
 theme.path = theme.config .. "/themes/" .. theme.name
 
--- theme.font          = "terminus 9"
 theme.font          = "Sans 8"
 
 theme.bg_normal     = "#1c1c1c"
@@ -18,7 +17,7 @@ theme.fg_normal     = "#C5C5C5"
 theme.fg_focus      = "#E4E4E4"
 theme.fg_urgent     = "#A36666"
 
-theme.border_width  = "1"
+theme.border_width  = 4
 theme.border_normal = "#272C30"
 theme.border_focus  = "#7985A3"
 theme.border_marked = "#A3BA8C"
@@ -42,11 +41,11 @@ theme.tasklist_floating_icon = "/usr/share/awesome/themes/default/tasklist/float
 theme.menu_bg_focus = "#7985A3"
 theme.menu_bg_normal = "#454545"
 theme.menu_border_color = "#7985A3"
-theme.menu_border_width = "0"
+theme.menu_border_width = 0
 theme.menu_submenu_icon = "/usr/share/awesome/themes/default/submenu.png"
-theme.menu_height   = "24"
-theme.menu_context_height = "19"
-theme.menu_width    = "200"
+theme.menu_height   = 24
+theme.menu_context_height = 19
+theme.menu_width    = 200
 
 -- You can add as many variables as
 -- you wish and access them by using
