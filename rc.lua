@@ -158,23 +158,6 @@ naughty.config.presets.low.width = logmon_width
 naughty.config.presets.normal.width = logmon_width
 naughty.config.presets.critical.width = logmon_width
 
--- Popup menus
-
-popups = {
---    fg_focus
---    bg_focus
---    fg_normal
---    bg_normal
-
---    submenu_icon
-
-    height = 10,
---    width
-
---    border_color = 
---    border_width
-}
-
 -- Table of layouts to cover with awful.layout.inc, order matters.
 layouts = 
 {
@@ -185,7 +168,6 @@ layouts =
     awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
     awful.layout.suit.fair,
-    awful.layout.suit.max.fullscreen,
     awful.layout.suit.magnifier,
     awful.layout.suit.floating
 }
@@ -196,6 +178,16 @@ awful.menu.menu_keys = {
 	back = { "Left", 'x', 'h' }, 
 	exec = { "Return", "Right", 'o', 'l' },
 	close = { "Escape" }
+}
+
+chord_menu_args = {
+    coords={ x=0, y=0 },
+    keygrabber = false
+}
+
+mainmenu_args = {
+    coords={ x=0, y=0 },
+    keygrabber = true
 }
 
 myrc.memory.init()
@@ -217,7 +209,7 @@ mymainmenu = myrc.mainmenu.build()
 mylauncher = awful.widget.button({image = beautiful.awesome_icon})
 -- Main menu will be placed at left top corner of screen
 mylauncher:buttons(awful.util.table.join(mylauncher:buttons(), 
-    awful.button({}, 1, nil, function () myrc.mainmenu.show(mymainmenu,false) end)))
+    awful.button({}, 1, nil, function () mymainmenu:show(mainmenu_args) end)))
 
 -- Create a systray
 mysystray = widget({ type = "systray" })
@@ -245,11 +237,9 @@ mylayoutbox = {}
 mylayoutbox.buttons = awful.util.table.join(
 	awful.button({ }, 1, function () 
 		awful.layout.inc(layouts, 1) 
-		naughty.notify({text = awful.layout.getname(awful.layout.get(1))}) 
 	end),
 	awful.button({ }, 3, function () 
 		awful.layout.inc(layouts, -1) 
-		naughty.notify({text = awful.layout.getname(awful.layout.get(1))}) 
 	end),		
 	awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
 	awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end) 
@@ -278,8 +268,10 @@ mytasklist.buttons = awful.util.table.join(
 		c:raise()
 	end),
 	awful.button({ }, 3, function (c) 
-        if mycontextmenu then awful.menu.hide(mycontextmenu) end
-        mycontextmenu = myrc.keybind.chord_show_menu(mychord_client(c))
+        if mycontextmenu then mycontextmenu:hide() end
+        local mp = mouse.coords()
+        mycontextmenu = myrc.keybind.chord_menu(chord_client(c))
+        mycontextmenu:show({coords = {x = mp.x-1*beautiful.menu_width/3, y = mp.y}})
     end),
 	awful.button({ }, 4, function ()
 		awful.client.focus.byidx(1)
@@ -343,7 +335,7 @@ end
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-    awful.button({ }, 3, function () awful.menu.show(mymainmenu) end),
+    awful.button({ }, 3, function () mymainmenu:show() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
@@ -433,77 +425,167 @@ function run_or_raise(cmd, properties)
     awful.util.spawn(cmd)
 end
 
-function mychord_client(c)
+function chord_client(c)
     return {
-        myrc.keybind.key({{}, "Escape", "Cancel", function () end,
-            finish = true}),
+        menu = {
+        },
+        naughty = {
+            title = "::Client::"
+        },
 
-        myrc.keybind.key({{}, "k", "Kill", function () 
+        {{}, "Escape", "Cancel", function () 
+        end},
+
+        {{"Shift"}, "k", "Kill", function () 
             c:kill()
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "l", "Toggle floating", function () 
+        {{}, "l", "Toggle floating", function () 
             save_floating(c, not awful.client.floating.get(c))
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "c", "Set centered on", function () 
+        {{}, "c", "Set centered on", function () 
             save_centered(c, true)
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{"Shift"}, "c", "Set centered off", function () 
+        {{"Shift"}, "c", "Set centered off", function () 
             save_centered(c, false)
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "t", "Toggle titlebar", function () 
+        {{}, "t", "Toggle titlebar", function () 
             save_titlebar(c, not get_titlebar(c, false)) 
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "g", "Save geometry", function () 
+        {{}, "g", "Save geometry", function () 
             save_geometry(c, get_geometry(c))
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "f", "Toggle fullscreen", function () 
+        {{}, "f", "Toggle fullscreen", function () 
             c.maximized_horizontal = not c.maximized_horizontal
             c.maximized_vertical   = not c.maximized_vertical
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "r", "Rename", function () 
+        {{}, "r", "Rename", function () 
             awful.prompt.run(
             { prompt = "Rename client: " }, 
             mypromptbox[mouse.screen].widget, 
             function(n) awful.client.property.set(c,"name", n) end,
             awful.completion.bash,
             awful.util.getdir("cache") .. "/rename")
-        end,
-        finish = true}),
+        end},
 
-        myrc.keybind.key({{}, "s", "Stick to this tag", function () 
+        {{}, "s", "Stick to this tag", function () 
             local t = awful.tag.selected()
             save_tag(c, t) 
             naughty.notify({text = "Client " .. c.name .. " has been sticked to tag " .. t.name}) 
-        end,
-        finish = true}), 
+        end}, 
 
-        myrc.keybind.key({{"Shift"}, "s", "Unstick from any tag", function () 
+        {{"Shift"}, "s", "Unstick from any tag", function () 
             save_tag(c, nil) 
             naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
-        end,
-        finish = true}),
+        end},
     } 
+end
+
+function chord_mpd()
+    return {
+        menu = {
+        },
+        naughty = {
+            title = "::MPD::"
+        },
+
+        {{}, "Escape", "Cancel", function () 
+        end},
+
+        {{}, "w", "Cancel", function () 
+        end},
+
+        {{}, "p", "Play/pause", function () 
+            awful.util.spawn("mpc toggle")
+        end},
+
+        {{}, "n", "Next", function () 
+            awful.util.spawn("mpc next")
+        end},
+
+        {{"Shift"}, "n", "Prev", function () 
+            awful.util.spawn("mpc prev")
+        end},
+
+        {{}, "b", "Back", function () 
+            awful.util.spawn("mpc seek 0%")
+        end},
+
+        {{}, "9", "Vol down", function () 
+            awful.util.spawn("mpc volume -5")
+            return false
+        end},
+
+        {{}, "0", "Vol up", function () 
+            awful.util.spawn("mpc volume +5")
+            return false
+        end},
+    }
+end
+
+function chord_tags()
+    return {
+        menu = {
+        },
+        naughty = {
+            title = "::TAGS::"
+        },
+        {{}, "Escape", "Cancel", function () 
+        end},
+
+        {{}, "Return", "Cancel", function () 
+        end},
+
+        {{}, "r", "Rename current tag", function () 
+            awful.prompt.run(
+            { prompt = "Rename this tag: " }, 
+            mypromptbox[mouse.screen].widget, 
+            function(newname) 
+                myrc.tagman.rename(awful.tag.selected(),newname) 
+            end, 
+            awful.completion.bash,
+            awful.util.getdir("cache") .. "/tag_rename")
+        end},
+
+        {{}, "c", "Create new tag", function () 
+            awful.prompt.run(
+            { prompt = "Create new tag: " }, 
+            mypromptbox[mouse.screen].widget, 
+            function(newname) 
+                local t = myrc.tagman.add(newname) 
+                myrc.tagman.move(t, awful.tag.selected()) 
+            end, 
+            awful.completion.bash,
+            awful.util.getdir("cache") .. "/tag_new")
+        end},
+
+        {{}, "d", "Delete current tag", function () 
+            myrc.tagman.del(awful.tag.selected()) 
+        end}, 
+
+        {{}, "k", "Move tag right", function () 
+            myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(0))
+            return false
+        end}, 
+
+        {{}, "j", "Move tag left", function () 
+            myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(-2))
+            return false
+        end}
+    }
 end
 
 -- Bind keyboard digits
 globalkeys = awful.util.table.join(
 
     -- Main menu
-    awful.key({ altkey            }, "Escape", function() myrc.mainmenu.show(mymainmenu,true) end),
+    awful.key({ altkey            }, "Escape", function() mymainmenu:show(mainmenu_args) end),
 
     -- Awesome control
     awful.key({ modkey, "Control" }, "q", awesome.quit),
@@ -548,89 +630,13 @@ globalkeys = awful.util.table.join(
     awful.key({ altkey, "Control" }, "l", function () awful.tag.incncol(-1) end),
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts, 1) end),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
-
-    -- MPD commands
     awful.key({ altkey,           }, "e", function () 
-        myrc.keybind.push_menu("::MPD::", {
-            myrc.keybind.key({ {}, "Escape", "Cancel", function () end,
-            finish = true}),
-
-            myrc.keybind.key({{}, "w", "Cancel", function () end,
-            finish = true}),
-
-            myrc.keybind.key({{}, "p", "Play/pause", function () 
-                awful.util.spawn("mpc toggle")
-            end}),
-
-            myrc.keybind.key({{}, "n", "Next", function () 
-                awful.util.spawn("mpc next")
-            end}),
-
-            myrc.keybind.key({{"Shift"}, "n", "Prev", function () 
-                awful.util.spawn("mpc prev")
-            end}),
-
-            myrc.keybind.key({{}, "b", "Back", function () 
-                awful.util.spawn("mpc seek 0%")
-            end}),
-
-            myrc.keybind.key({{}, "9", "Vol down", function () 
-                awful.util.spawn("mpc volume -5")
-            end}),
-
-            myrc.keybind.key({{}, "0", "Vol up", function () 
-                awful.util.spawn("mpc volume +5")
-            end}),
-        })
+        myrc.keybind.push_menu(chord_mpd(), chord_menu_args) 
     end),
 
     -- Tagset operations (Win+Ctrl+s,<letter> chords)
     awful.key({ altkey,           }, "F3", function () 
-        myrc.keybind.push_menu("::Tags::", {
-            myrc.keybind.key({{}, "Escape", "Cancel", function () end,
-            finish = true}),
-
-            myrc.keybind.key({{}, "Return", "Cancel", function () end,
-            finish = true}),
-
-            myrc.keybind.key({{}, "r", "Rename current tag", function () 
-                awful.prompt.run(
-                { prompt = "Rename this tag: " }, 
-                mypromptbox[mouse.screen].widget, 
-                function(newname) 
-                    myrc.tagman.rename(awful.tag.selected(),newname) 
-                end, 
-                awful.completion.bash,
-                awful.util.getdir("cache") .. "/tag_rename")
-            end,
-            finish = true}),
-
-            myrc.keybind.key({{}, "c", "Create new tag", function () 
-                awful.prompt.run(
-                { prompt = "Create new tag: " }, 
-                mypromptbox[mouse.screen].widget, 
-                function(newname) 
-                    local t = myrc.tagman.add(newname) 
-                    myrc.tagman.move(t, awful.tag.selected()) 
-                end, 
-                awful.completion.bash,
-                awful.util.getdir("cache") .. "/tag_new")
-            end,
-            finish = true}),
-
-            myrc.keybind.key({{}, "d", "Delete current tag", function () 
-                myrc.tagman.del(awful.tag.selected()) 
-            end,
-            finish = true}), 
-
-            myrc.keybind.key({{}, "k", "Move tag right", function () 
-                myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(0))
-            end}), 
-
-            myrc.keybind.key({{}, "j", "Move tag left", function () 
-                myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(-2))
-            end})
-        }) 
+        myrc.keybind.push_menu(chord_tags(), chord_menu_args) 
     end)
 )
 
@@ -661,9 +667,7 @@ clientkeys = awful.util.table.join(
 
     -- Client keys
     awful.key({ altkey ,        }, "3", function(c) 
-        myrc.keybind.push_menu ( "::Client::", mychord_client(c), c, 
-            { x = 0, y = 0, height = 7 }
-            )
+        myrc.keybind.push_menu(chord_client(c), chord_menu_args, c)
     end)
 )
 
@@ -726,7 +730,7 @@ client.add_signal("manage", function (c, startup)
 
     c:add_signal("mouse::enter", function(c)
         function kill_mousemode_menu(m) 
-            if m and (true ~= m.keygrabber) then awful.menu.hide(m) end 
+            if m and (true ~= m.keygrabber) then m:hide() end 
         end
         kill_mousemode_menu(mymainmenu)
         kill_mousemode_menu(mycontextmenu)
