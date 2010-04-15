@@ -30,6 +30,7 @@ function build()
     local editor = (env.editor or "xterm -e " .. (os.getenv("EDITOR") or "vim")) .. " "
     local browser = (env.browser or "firefox") .. " "
     local run = (env.run or "gmrun")
+    local fileman = env.fileman or "xterm -e mc"
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -49,6 +50,7 @@ function build()
     local mymainmenu_items_head = {
         { "Awesome", myawesomemenu, beautiful.awesome_icon },
         { "Terminal", terminal, freedesktop_utils.lookup_icon({icon = 'terminal'}) },
+        { "File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
         { "Browser", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
         {"", nil, nil} --separator
     }

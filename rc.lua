@@ -134,6 +134,7 @@ env = {
     man = "xterm -e man ",
     terminal = "xterm ", 
     screen = "xterm -e screen",
+    fileman = "xterm -e mc",
     terminal_root = "xterm -e su -c screen",
     im = "pidgin ",
     editor = os.getenv("EDITOR") or "xterm -e vim ",
