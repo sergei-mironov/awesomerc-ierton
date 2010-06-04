@@ -142,7 +142,8 @@ env = {
     music_show = "gmpc --replace",
     music_hide = "gmpc --quit",
     run = "gmrun",
-    locker = "xscreensaver-command -lock"
+    locker = "xscreensaver-command -lock",
+    xkill = "xkill"
 }
 
 -- Pipelets
