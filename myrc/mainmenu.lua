@@ -31,6 +31,7 @@ function build()
     local browser = (env.browser or "firefox") .. " "
     local run = (env.run or "gmrun")
     local fileman = env.fileman or "xterm -e mc"
+    local xkill = env.xkill or "xkill" .. " "
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -57,7 +58,8 @@ function build()
 
     local mymainmenu_items_tail = {
         { "", nil, nil}, --separator
-        { "Run", run, nil },
+        { "Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
+        { "Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
         { "Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'gtk-refresh' }) },
         { "Quit", awesome.quit, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) } 
     }
