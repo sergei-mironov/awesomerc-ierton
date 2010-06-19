@@ -144,7 +144,8 @@ env = {
     music_hide = "gmpc --quit",
     run = "gmrun",
     locker = "xscreensaver-command -lock",
-    xkill = "xkill"
+    xkill = "xkill",
+    shutdown = "xterm -e " .. awful.util.getdir("config").."/shutdown"
 }
 
 -- Pipelets

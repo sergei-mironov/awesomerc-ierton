@@ -32,20 +32,22 @@ function build()
     local run = (env.run or "gmrun")
     local fileman = env.fileman or "xterm -e mc"
     local xkill = env.xkill or "xkill" .. " "
+    local shutdown = env.shutdown or nil
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
     freedesktop_utils.icon_sizes = {beautiful.icon_theme_size}
 
     local myawesomemenu = { 
-        { "Manual", man .. "awesome", freedesktop_utils.lookup_icon({ icon = 'help' }) },
+        { "Themes", themes.menu() }, 
         { "Edit config", editor .. awful.util.getdir("config") .. "/rc.lua", 
             freedesktop_utils.lookup_icon({ icon = 'package_settings' }) 
         },
         { "Edit theme", editor .. awful.util.getdir("config") .. "/current_theme" ,
             freedesktop_utils.lookup_icon({ icon = 'package_settings' }) 
         },
-        { "Themes", themes.menu() }, 
+        { "Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'gtk-refresh' }) },
+        { "Stop", awesome.quit, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) } 
     }
 
     local mymainmenu_items_head = {
@@ -53,15 +55,14 @@ function build()
         { "Terminal", terminal, freedesktop_utils.lookup_icon({icon = 'terminal'}) },
         { "File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
         { "Browser", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
-        {"", nil, nil} --separator
+        { "", nil, nil} --separator
     }
 
     local mymainmenu_items_tail = {
         { "", nil, nil}, --separator
         { "Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
         { "Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
-        { "Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'gtk-refresh' }) },
-        { "Quit", awesome.quit, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) } 
+        { "Quit", shutdown, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })},
     }
 
     local mymainmenu_items = {}
