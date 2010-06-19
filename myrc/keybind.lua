@@ -19,7 +19,7 @@ local tostring = tostring
 module("myrc.keybind")
 
 
-local the_chord = nil
+local active = nil
 
 local function get_keys(c)
     if c == nil then
@@ -89,23 +89,29 @@ end
 
 -- Cancels current chord, if any
 function pop()
-    if the_chord ~= nil then
-        chord_release(the_chord)
-        the_chord = nil
+    if active ~= nil then
+        chord_release(active)
+        active = nil
     end
 end
 
-local function chord_new(kt, title, c)
+local function mod(k) return k[1] end
+local function keysym(k) return k[2] end
+local function desc(k) return k[3] or "<no description>" end
+local function press(k) return k[4] end
+local function icon(k) return k[5] end
+
+local function chord_new(keytable, c)
     local newkeys = nil
     local chord = {}
-    local old = nil
-    for _, k in ipairs(kt) do
+    local old = {}
+    for _, k in ipairs(keytable) do
         if #k < 3 then
-            dbg("Invalid chord key detected after:" .. old.keysym)
+            dbg("Invalid chord key detected after:" .. keysym(old))
         end
-        k.keys = awful.key(k.mod, k.keysym, function()
-            k.press()
-            if k.finish then pop() end
+        k.keys = awful.key(mod(k), keysym(k), function()
+            local finish = press(k)()
+            if finish ~= false then pop() end
         end)
         newkeys = awful.util.table.join(newkeys, k.keys)
         old = k
@@ -118,56 +124,40 @@ local function chord_new(kt, title, c)
     set_keys(c, allkeys)
 
     chord.client = c
-    chord.keytable = kt
-    chord.title = title
+    chord.keytable = keytable
     return chord
 end
 
--- This function shows menu at position {x, y} aka menu_coord
--- kg is keygrabber (true/false)
-local function show_at(menu, kg)
-    local old_coords = mouse.coords()
-    local menu_coords = old_coords
-    if menu.x then menu_coords.x = menu.x end
-    if menu.y then menu_coords.y = menu.y end
-    mouse.coords(menu_coords)
-    awful.menu.show(menu, kg)
-    mouse.coords(old_coords)
-end
-
-function chord_show_menu(keytable, template)
-
-    local template = template or {}
-    local menu_items = {}
+-- Constructs menu describing chord table given
+function chord_menu(keytable)
+    local template = keytable.menu or {}
+    template.items = {}
 
     for _, k in ipairs(keytable) do
-        table.insert(menu_items, 
-            {tostring(k.keysym) .. ": " .. k.desc, k.press})
+        local item = {
+            tostring(keysym(k)) .. ": " .. desc(k), 
+            press(k),
+            icon(k)
+        }
+        table.insert(template.items, item)
     end
 
-    template.items = menu_items
-
-    local m = awful.menu.new(template)
-    m.x = template.x
-    m.y = template.y
-    m.show = show_at
-    m:show()
-    return m
+    return awful.menu.new(template)
 end
 
-function chord_naughty(keytable, title, template)
-    local description = ""
-    local template = template or {}
+-- Constructs naughty box describing chord table given
+function chord_naughty(keytable)
+    local template = keytable.naughty or {}
+
+    template.text = ""
     for _, k in ipairs(keytable) do
         -- TODO: Take modifiers into account when 
         -- generating descriptions
-        description = description .. 
-        "\n" .. tostring(k.keysym) ..  
+        template.text = template.text ..
+        "\n" .. tostring(k.keysym) ..
         ": " ..  ( k.desc or "<no_description>" )
     end
 
-    template.title = title
-    template.text = description
     return naughty.notify(template)
 end
 
@@ -175,50 +165,30 @@ end
 -- into client's keys(). Then it pops naughtybox 
 -- showing chord description.
 --
--- title: naughty's title
--- keytable: keys to be mapped
--- c: client. if nil, global keys will be used.
---
--- Note: 
--- 1) User has to call pop() manually to cancel 
--- current chord, or push() to start another chord.
--- 2) User has to use keybind.key() instead of awful.key()
--- to build 'keytable' table
-function push(title, keytable, c)
+-- @param keytable Keys to be mapped
+-- @param c Client. if nil, global keys will be used.
+function push(keytable, c)
     pop()
-    the_chord = chord_new(keytable, title, c)
-    return the_chord
+    active = chord_new(keytable, c)
+    return active
 end
 
-function push_menu(title, keytable, c, template)
-    local chord = push(title, keytable, c)
-    local menu = chord_show_menu(keytable, template)
+function push_menu(keytable, args, c)
+    local chord = push(keytable, c)
+    local menu = chord_menu(keytable)
     menu.hide = function(m)
         awful.menu.hide(m)
         pop()
     end
     chord.menu = menu
+    chord.menu:show(args)
     return chord
 end
 
-function push_naughty(title, keytable, c, template)
-    local chord = push(title, keytable, c)
-    local nb = chord_naughty(chord, template)
+function push_naughty(keytable, c)
+    local chord = push(keytable, c)
+    local nb = chord_naughty(keytable)
     chord.naughtybox = nb
     return chord
-end
-
--- User should use this function inside push()
--- to build chord table
-function key(kt)
-    kt.mod = kt.mod or kt[1]
-    if kt.mod == nil then return {} end
-    kt.keysym = kt.keysym or kt[2]
-    if kt.keysym == nil then return {} end
-    kt.desc = kt.desc or kt[3] or "<no description>"
-    kt.press = kt.press or kt[4]
-    if kt.press == nil then return {} end
-    kt.finish = kt.finish or false
-    return kt
 end
 

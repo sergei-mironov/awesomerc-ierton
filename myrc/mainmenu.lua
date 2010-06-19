@@ -69,16 +69,6 @@ function build()
     for _, item in ipairs(freedesktop_menu.new()) do table.insert(mymainmenu_items, item) end
     for _, item in ipairs(mymainmenu_items_tail) do table.insert(mymainmenu_items, item) end
 
-    return awful.menu({ items = mymainmenu_items })
-end
-
--- This function shows menu at position {x, y} aka menu_coord
--- kg is keygrabber (true/false)
-function show(menu, kg, menu_coords)
-    local old_coords = mouse.coords()
-    local menu_coords = menu_coords or {x=0, y=0}
-    mouse.coords(menu_coords)
-    awful.menu.show(menu, kg)
-    mouse.coords(old_coords)
+    return awful.menu({ items = mymainmenu_items, x = 0, y = 0})
 end
 
