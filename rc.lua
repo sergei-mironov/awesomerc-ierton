@@ -648,11 +648,13 @@ clientkeys = awful.util.table.join(
         local tag = myrc.tagman.getn(-1)
         awful.client.movetotag(tag, c)
         awful.tag.viewonly(tag)
+        c:raise()
     end),
     awful.key({ modkey }, "F2", function (c) 
         local tag = myrc.tagman.getn(1)
         awful.client.movetotag(tag, c)
         awful.tag.viewonly(tag)
+        c:raise()
     end),
     awful.key({ altkey }, "F4", function (c) 
         c:kill() 
