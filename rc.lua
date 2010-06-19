@@ -296,32 +296,29 @@ for s = 1, screen.count() do
 
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, 
-		awful.widget.taglist.label.all, 
-		mytaglist.buttons)
+        awful.widget.taglist.filter.all, 
+        mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(
-    function(c)
-        local text,bg,st,icon = awful.widget.tasklist.label.currenttags(c, s)
-        local usertext = awful.client.property.get(c, "name")
-        if text ~= nil and usertext ~= nil then text = usertext end
-        return text,bg,st,icon
-    end, mytasklist.buttons)
+    mytasklist[s] = awful.widget.tasklist(s, 
+        awful.widget.tasklist.filter.currenttags, 
+        mytasklist.buttons)
 
     -- Create top wibox
     mytop[s] = awful.wibox({ position = "top", screen = s, })
     mytop[s].widgets = {
+        mylauncher,
+        mylayoutbox[s],
+        mytaglist[s],
+        mypromptbox[s],
 		{
-			mylauncher,
-			mylayoutbox[s],
-			mytaglist[s],
-			mypromptbox[s],
-			layout = awful.widget.layout.horizontal.leftright
+            s == 1 and mysystray or nil,
+            mytextclock,
+            layout = awful.widget.layout.horizontal.rightleft
 		},
-		s == 1 and mysystray or nil,
-		mytextclock,
-		mytasklist[s],
-		layout = awful.widget.layout.horizontal.rightleft
+        mytasklist[s],
+        layout = awful.widget.layout.horizontal.leftright,
+        height = mytop[s].height
 	}
 
     -- Create bottom wibox
@@ -471,7 +468,9 @@ function chord_client(c)
             awful.prompt.run(
             { prompt = "Rename client: " }, 
             mypromptbox[mouse.screen].widget, 
-            function(n) awful.client.property.set(c,"name", n) end,
+            function(n) 
+                awful.client.property.set(c,"name", n) 
+            end,
             awful.completion.bash,
             awful.util.getdir("cache") .. "/rename")
         end},
