@@ -428,6 +428,7 @@ end
 function chord_client(c)
     return {
         menu = {
+            height = theme.context_menu_height
         },
         naughty = {
             title = "::Client::"
@@ -492,6 +493,7 @@ end
 function chord_mpd()
     return {
         menu = {
+            height = theme.context_menu_height
         },
         naughty = {
             title = "::MPD::"
@@ -534,6 +536,7 @@ end
 function chord_tags()
     return {
         menu = {
+            height = theme.context_menu_height
         },
         naughty = {
             title = "::TAGS::"

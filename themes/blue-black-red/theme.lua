@@ -44,8 +44,8 @@ theme.menu_border_color = "#7985A3"
 theme.menu_border_width = 0
 theme.menu_submenu_icon = "/usr/share/awesome/themes/default/submenu.png"
 theme.menu_height   = 24
-theme.menu_context_height = 19
 theme.menu_width    = 200
+theme.context_menu_height = 20
 
 -- You can add as many variables as
 -- you wish and access them by using
@@ -77,7 +77,8 @@ theme.titlebar_maximized_button_normal_active = theme.path .. "/titlebar/maximiz
 theme.titlebar_maximized_button_focus_active = theme.path .. "/titlebar/maximized_focus_active.png"
 
 -- You can use your own command to set your wallpaper
-theme.wallpaper_cmd = { "awsetbg " .. theme.config .. "/wallpapers/vladstudio-1.jpg" }
+--theme.wallpaper_cmd = { "awsetbg " .. theme.config .. "/wallpapers/vladstudio-1.jpg" }
+theme.wallpaper_cmd = { "awsetbg " .. theme.config .. "/wallpapers/bricks.png" }
 
 -- You can use your own layout icons like this:
 theme.layout_dwindle = "/usr/share/awesome/themes/default/layouts/dwindlew.png"
