@@ -1,8 +1,9 @@
 -- Include awesome libraries, with lots of useful function!
 require("awful")
+require("awful.titlebar")
+require("awful.autofocus")
 require("awesome")
 require("client")
-require("awful.autofocus")
 require("beautiful")
 require("naughty")
 require("freedesktop.utils")
@@ -75,8 +76,8 @@ end
 function save_centered(c, val)
 	myrc.memory.set("centered", client_name(c), val)
 	if val == true then
-		awful.placement.centered(c)
         save_floating(c, true)
+		awful.placement.centered(c)
 	end
 	return val
 end
