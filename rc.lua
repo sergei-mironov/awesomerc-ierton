@@ -469,7 +469,7 @@ function chord_client(c)
             { prompt = "Rename client: " }, 
             mypromptbox[mouse.screen].widget, 
             function(n) 
-                awful.client.property.set(c,"name", n) 
+                awful.client.property.set(c,"label", n) 
             end,
             awful.completion.bash,
             awful.util.getdir("cache") .. "/rename")
