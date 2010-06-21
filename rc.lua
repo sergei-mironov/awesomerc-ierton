@@ -134,8 +134,8 @@ env = {
     browser = "firefox ",
     man = "urxvt -e man ",
     terminal = "urxvt ", 
-    screen = "urxvt -e screen",
-    fileman = "urxvt -e mc",
+    screen = "urxvt -e zsh -ic screen",
+    fileman = "urxvt -e zsh -ic mc",
     terminal_root = "urxvt -e su -c screen",
     im = "pidgin ",
     editor = os.getenv("EDITOR") or "urxvt -e vim ",
@@ -324,12 +324,13 @@ for s = 1, screen.count() do
 	}
 
     -- Create bottom wibox
-    mybottom[s] = awful.wibox({ position = "bottom", screen = s, })
+    mybottom[s] = awful.wibox({ 
+        position = "bottom", screen = s, height = beautiful.wibox_bottom_height})
     mybottom[s].widgets = {
-		mybatbox,
-		mymountbox,
-		layout = awful.widget.layout.horizontal.leftright
-	}
+        mybatbox,
+        mymountbox,
+        layout = awful.widget.layout.horizontal.leftright
+    }
 
 end
 -- }}}
@@ -429,7 +430,7 @@ end
 function chord_client(c)
     return {
         menu = {
-            height = theme.context_menu_height
+            height = theme.menu_context_height
         },
         naughty = {
             title = "::Client::"
@@ -494,7 +495,7 @@ end
 function chord_mpd()
     return {
         menu = {
-            height = theme.context_menu_height
+            height = theme.menu_context_height
         },
         naughty = {
             title = "::MPD::"
@@ -537,7 +538,7 @@ end
 function chord_tags()
     return {
         menu = {
-            height = theme.context_menu_height
+            height = theme.menu_context_height
         },
         naughty = {
             title = "::TAGS::"

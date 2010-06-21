@@ -35,6 +35,9 @@ theme.taglist_squares_sel = "/usr/share/awesome/themes/default/taglist/squarefw.
 theme.taglist_squares_unsel = "/usr/share/awesome/themes/default/taglist/squarew.png"
 theme.tasklist_floating_icon = "/usr/share/awesome/themes/default/tasklist/floatingw.png"
 
+-- Bottom wibox height
+theme.wibox_bottom_height = 17
+
 -- Variables set for theming menu
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
@@ -45,7 +48,7 @@ theme.menu_border_width = 0
 theme.menu_submenu_icon = "/usr/share/awesome/themes/default/submenu.png"
 theme.menu_height   = 24
 theme.menu_width    = 200
-theme.context_menu_height = 20
+theme.menu_context_height = 20
 
 -- You can add as many variables as
 -- you wish and access them by using
