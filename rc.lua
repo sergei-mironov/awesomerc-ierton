@@ -126,20 +126,20 @@ altkey = "Mod1"
 -- Helper variables
 env = {
     browser = "firefox ",
-    man = "xterm -e man ",
-    terminal = "xterm ", 
-    screen = "xterm -e screen",
-    fileman = "xterm -e mc",
-    terminal_root = "xterm -e su -c screen",
+    man = "urxvt -e man ",
+    terminal = "urxvt ", 
+    screen = "urxvt -e screen",
+    fileman = "urxvt -e mc",
+    terminal_root = "urxvt -e su -c screen",
     im = "pidgin ",
-    editor = os.getenv("EDITOR") or "xterm -e vim ",
+    editor = os.getenv("EDITOR") or "urxvt -e vim ",
     home_dir = os.getenv("HOME"),
     music_show = "gmpc --replace",
     music_hide = "gmpc --quit",
     run = "gmrun",
     locker = "xscreensaver-command -lock",
     xkill = "xkill",
-    shutdown = "xterm -e " .. awful.util.getdir("config").."/shutdown"
+    shutdown = "urxvt -e " .. awful.util.getdir("config").."/shutdown"
 }
 
 -- Pipelets
