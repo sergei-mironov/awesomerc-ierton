@@ -6,21 +6,22 @@ die() {
 	exit 1
 }
 
-check_prog() {
+check() {
 	which "$1" >/dev/null 2>&1 || die "Please install $1"
 }
 
 export PATH=$PATH:/sbin
-check_prog poweroff
-check_prog reboot
-check_prog slock
+check poweroff
+check reboot
+test -z "$XLOCK" && which xscreensaver-command && XLOCK="xscreensaver-command -lock"
+test -z "$XLOCK" && which slock && XLOCK="slock"
+test -z "$XLOCK" && die "Please install xscreensaver or slock"
 
 sed -n '/^###/,/$$$/ p' $0 > .dlgconfig
 export DIALOGRC=.dlgconfig
 dialog --menu "Select logout action:" 10 30 3 1 Shutdown 2 Reboot 3 Lock 2> .dlgaction
 
 ACTION=`cat .dlgaction`
-
 case $ACTION in
     Shutdown|1)
         sudo poweroff
@@ -29,7 +30,7 @@ case $ACTION in
         sudo reboot
         ;;
     LockScreen|3)
-        slock
+        $XLOCK
         ;;
     ""|0)
         ;;
@@ -38,6 +39,7 @@ case $ACTION in
         ;;
 esac
 
+clear
 exit 0
 
 ###
@@ -67,13 +69,13 @@ tab_len = 0
 visit_items = OFF
 
 # Shadow dialog boxes? This also turns on color.
-use_shadow = ON
+use_shadow = OFF
 
 # Turn color support ON or OFF
 use_colors = ON
 
 # Screen color
-screen_color = (BLACK,BLACK,ON)
+screen_color = (BLACK,BLACK,OFF)
 
 # Shadow color
 shadow_color = (BLACK,BLACK,ON)
