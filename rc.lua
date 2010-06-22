@@ -314,8 +314,8 @@ for s = 1, screen.count() do
         mytaglist[s],
         mypromptbox[s],
 		{
-            s == 1 and mysystray or nil,
             mytextclock,
+            s == 1 and mysystray or nil,
             layout = awful.widget.layout.horizontal.rightleft
 		},
         mytasklist[s],
