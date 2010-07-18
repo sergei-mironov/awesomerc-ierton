@@ -459,7 +459,7 @@ function chord_client(c)
         end},
 
         {{}, "g", "Save geometry", function () 
-            save_geometry(c, get_geometry(c))
+            save_geometry(c, c:geometry())
         end},
 
         {{}, "f", "Toggle fullscreen", function () 
