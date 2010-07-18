@@ -134,8 +134,8 @@ env = {
     browser = "firefox ",
     man = "urxvt -e man ",
     terminal = "urxvt ", 
-    screen = "urxvt -e zsh -ic screen",
-    fileman = "urxvt -e zsh -ic mc",
+    screen = "urxvt -e screen",
+    fileman = "urxvt -e mc",
     terminal_root = "urxvt -e su -c screen",
     im = "pidgin ",
     editor = os.getenv("EDITOR") or "urxvt -e vim ",
@@ -460,7 +460,7 @@ function chord_client(c)
         end},
 
         {{}, "g", "Save geometry", function () 
-            save_geometry(c, get_geometry(c))
+            save_geometry(c, c:geometry())
         end},
 
         {{}, "f", "Toggle fullscreen", function () 
