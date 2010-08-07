@@ -1,0 +1,15 @@
+#!/bin/sh
+
+IFS=$'\n'
+
+iwgrab() {
+    /sbin/iwconfig wlan0 | grep ESSID | sed 's/.*ESSID:"\([^\"]\+\)"/ESSID: \1/'
+}
+
+iwgrab
+
+tail -F -n0 /var/log/messages | grep --line-buffered -E "DISCONNECTED|CONNECTED" | while read l ; do
+    sleep 3
+    iwgrab
+done
+

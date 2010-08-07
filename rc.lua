@@ -230,11 +230,15 @@ pipelets.register_fmt(mytextclock, "date", " $1 ")
 
 -- Mountbox
 mymountbox = widget({ type = "textbox", align="right" })
-pipelets.register( mymountbox, "mmount")
+pipelets.register_fmt( mymountbox, "mmount", " $1")
 
 -- BatteryBox
 mybatbox = widget({ type = "textbox", align="right" })
 pipelets.register( mybatbox, "batmon")
+
+-- Wifi assoc ESSID
+mywifibox = widget({ type = "textbox", align="right" })
+pipelets.register_fmt( mywifibox, "wireless", "<span color='#4169E1'> $1</span>")
 
 -- Layoutbox
 mylayoutbox = {}
@@ -329,6 +333,7 @@ for s = 1, screen.count() do
     mybottom[s].widgets = {
         mybatbox,
         mymountbox,
+        mywifibox,
         layout = awful.widget.layout.horizontal.leftright
     }
 
