@@ -27,7 +27,7 @@ cleanup() {
 }
 
 check_pid() {
-	local pidfile="$HOME/.pipeman.pid"
+	local pidfile="$HOME/.pipeman:$DISPLAY.pid"
 	test -f "$pidfile" && kill `cat $pidfile`
 	echo $$ > "$pidfile"
 }
