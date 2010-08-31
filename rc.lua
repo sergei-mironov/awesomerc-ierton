@@ -4,6 +4,7 @@ require("awful.titlebar")
 require("awful.autofocus")
 require("awesome")
 require("client")
+require("screen")
 require("beautiful")
 require("naughty")
 require("freedesktop.utils")
@@ -57,33 +58,35 @@ function client_name(c)
 	return cls..":"..inst..":"..role..":"..ctype
 end
 
-function save_floating(c, f)
-	myrc.memory.set("floating", client_name(c), f)
-	awful.client.floating.set(c, f)
-    if f == true then
-        c.border_width = beautiful.border_width
-    else
+function client_adjust_bwidth(c)
+    if awful.client.floating.get(c) == false and 
+       awful.layout.get() == awful.layout.suit.max
+    then
         c.border_width = 0
+    else
+        c.border_width = beautiful.border_width
     end
-	return f
 end
 
-function get_floating(c, def)
-	if def == nil then def = awful.client.floating.get(c) end
-	return myrc.memory.get("floating", client_name(c), def)
+function save_geometry(c, g)
+	myrc.memory.set("geometry", client_name(c), g)
+	c:geometry(g)
+end
+
+function save_floating(c, f)
+	myrc.memory.set("floating", client_name(c), f)
+    awful.client.floating.set(c, f)
 end
 
 function save_centered(c, val)
-	myrc.memory.set("centered", client_name(c), val)
 	if val == true then
         save_floating(c, true)
 		awful.placement.centered(c)
+        save_geometry(c, c:geometry())
+    else
+        save_floating(c, false)
 	end
 	return val
-end
-
-function get_centered(c, def)
-	return myrc.memory.get("centered", client_name(c), def)
 end
 
 function save_titlebar(c, val)
@@ -112,15 +115,6 @@ end
 function get_tag(c, def)
 	local tn = myrc.memory.get("tags", client_name(c), def)
 	return myrc.tagman.find(tn)
-end
-
-function save_geometry(c, val)
-	myrc.memory.set("geometry", client_name(c), val)
-	c:geometry(val)
-end
-
-function get_geometry(c, def)
-	return myrc.memory.get("geometry", client_name(c), def)
 end
 --}}}
 
@@ -166,12 +160,12 @@ naughty.config.presets.critical.width = logmon_width
 layouts = 
 {
     awful.layout.suit.max,
-    awful.layout.suit.fair.horizontal,
+    awful.layout.suit.tile.bottom,
     awful.layout.suit.tile,
     awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
     awful.layout.suit.fair,
+    awful.layout.suit.fair.horizontal,
     awful.layout.suit.magnifier,
     awful.layout.suit.floating
 }
@@ -272,8 +266,12 @@ mytasklist.buttons = awful.util.table.join(
 		if not c:isvisible() then
 			awful.tag.viewonly(c:tags()[1])
 		end
-		client.focus = c
-		c:raise()
+        if client.focus == c then 
+            awful.client.focus.history.previous()
+        else
+            client.focus = c;
+        end 
+        client.focus:raise()
 	end),
 	awful.button({ }, 3, function (c) 
         if mycontextmenu then mycontextmenu:hide() end
@@ -354,7 +352,12 @@ function switch_to_client(direction)
 	if direction == 0 then
 		awful.client.focus.history.previous()
 	else
-		awful.client.focus.byidx(direction);  
+        if awful.layout.get() == awful.layout.suit.max then
+            awful.client.focus.byidx(direction);  
+        else
+            awful.client.cycle(direction == 1)
+            client.focus = awful.client.getmaster()
+        end
 	end
 	if client.focus then client.focus:raise() end
 end
@@ -449,7 +452,7 @@ function chord_client(c)
         end},
 
         {{}, "l", "Toggle floating", function () 
-            save_floating(c, not awful.client.floating.get(c))
+            save_floating(c, not (awful.client.floating.get(c) or false))
         end},
 
         {{}, "c", "Set centered on", function () 
@@ -690,7 +693,7 @@ clientbuttons = awful.util.table.join(
     awful.button({ modkey }, 1, awful.mouse.client.move),
     awful.button({ modkey }, 3, awful.mouse.client.resize)
 )
--- }}}
+--}}}
 
 -- {{{ Hooks
 -- Hook function to execute when focusing a client.
@@ -706,31 +709,33 @@ end)
 -- Hook function to execute when a new client appears.
 client.add_signal("manage", function (c, startup)
 
+    c:add_signal("mouse::enter", function(c)
+        function kill_mousemode_menu(m) 
+            if m and (true ~= m.keygrabber) then m:hide() end 
+        end
+        kill_mousemode_menu(mymainmenu)
+        kill_mousemode_menu(mycontextmenu)
+    end)
+
+    c:add_signal("property::floating", client_adjust_bwidth)
+
     local name = client_name(c)
     if c.type == "dialog" then 
         save_centered(c, true)
     end
 
-    local floating = myrc.memory.get("floating", name, awful.client.floating.get(c))
-    save_floating(c, floating)
-    if floating == true then
-        local centered = get_centered(c)
-        if centered then 
-            save_centered(c, centered)
-        end
-        local geom = get_geometry(c)
-        if geom then
-            save_geometry(c, geom)
-        end
-        local titlebar = get_titlebar(c)
-        if titlebar then
-            save_titlebar(c, titlebar)
-        end
+    local floating = myrc.memory.get("floating", name)
+    if floating ~= nil then 
+        awful.client.floating.set(c, floating)
     end
-
+    local floating = awful.client.floating.get(c)
+    local geom = myrc.memory.get("geometry", name)
+    if (geom ~= nil) and (floating==true) then
+        c:geometry(geom)
+    end
     local tag = get_tag(c, nil)
-    if tag ~= nil then
-        awful.client.movetotag(tag,c)
+    if tag then
+        awful.client.movetotag(tag, c)
     end
 
     -- Set key bindings
@@ -741,14 +746,6 @@ client.add_signal("manage", function (c, startup)
     if not c.icon and theme.default_client_icon then
         c.icon = image(theme.default_client_icon)
     end
-
-    c:add_signal("mouse::enter", function(c)
-        function kill_mousemode_menu(m) 
-            if m and (true ~= m.keygrabber) then m:hide() end 
-        end
-        kill_mousemode_menu(mymainmenu)
-        kill_mousemode_menu(mycontextmenu)
-    end)
 
     -- New client may not receive focus
     -- if they're not focusable, so set border anyway.
@@ -765,4 +762,13 @@ end)
 awesome.add_signal("tagman::update", function (t) 
     myrc.memory.set("tagnames","-", myrc.tagman.names())
 end)
+
+-- Will change border width for max layout
+for s = 1, screen.count() do
+    awful.tag.attached_add_signal(s,"property::layout", function()
+        for _,c in pairs(awful.tag.selected():clients()) do
+            client_adjust_bwidth(c)
+        end
+    end)
+end
 
