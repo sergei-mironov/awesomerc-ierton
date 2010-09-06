@@ -1,0 +1,16 @@
+#!/bin/sh
+
+die() {
+	echo $@ >&2
+	logger -i -t pipeman "error: $@"
+	exit 1
+}
+
+check_prog() {
+	which "$1" >/dev/null 2>&1 || die "Please install $1"
+}
+
+check_prog "xkb-switch"
+
+xkb-switch
+exec xkb-switch -W
