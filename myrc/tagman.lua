@@ -53,6 +53,16 @@ function get(index, s)
     return stags[awful.util.cycle(#stags, index)]
 end
 
+-- Returns index of current tag (on this screen)
+function indexof(tag)
+	local all_tags = capi.screen[tag.screen]:tags()
+	return awful.util.table.hasitem(all_tags,tag)
+end
+
+function next_to(t,n) return get(indexof(t)+(n or 1),s) end
+
+function prev_to(t,n) return get(indexof(t)-(n or 1),s) end
+
 -- Gets tag object, by its offset @offset, starting from 
 -- tag @basetag
 function getn(offset, basetag, s)
@@ -64,13 +74,15 @@ function getn(offset, basetag, s)
     return stags[awful.util.cycle(#stags, k + offset)]
 end
 
+-- Moves all tagless clients of screen @s to tag @deftag
 local function handle_orphans(s, deftag)
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local stags = capi.screen[s]:tags()
 	if #stags < 1 then return end
-    for _, c in pairs(client.get()) do
+    local deftag = deftag or stags[1]
+    for _, c in pairs(client.get(s)) do
         if #c:tags() == 0 then
-            c:tags({deftag or stags[1]})
+            c:tags({deftag})
         end
     end
 end
@@ -87,52 +99,62 @@ end
 -- Moves tag to position @where (if where is number) -OR- next
 -- to tag @where (if where is object)
 function move(tag, where, s)
-	local s = s or client.focus and client.focus.screen or capi.mouse.screen
-	local stags = capi.screen[s]:tags()
-	local oldkey = awful.util.table.hasitem(stags,tag)
+	local s = s or tag.screen
+	local stags = capi.screen[tag.screen]:tags()
+    local dtags = nil
+    if s ~= tag.screen  then
+        dtags = capi.screen[s]:tags()
+    end
+	local oldkey = indexof(tag)
+    local newkey = nil
+    if oldkey == nil then return end
 	local c = capi.client.focus
-	if oldkey == nil then return end
 	if type(where) == "number" then
-		local index = awful.util.cycle(#stags, where)
-		table.remove(stags,oldkey)
-		table.insert(stags,index,tag)
+		newkey = awful.util.cycle(#dtags, where)
 	else --tag object
-		local newkey = awful.util.table.hasitem(stags, where)
-		if newkey == nil then return end
-		local index = awful.util.cycle(#stags, newkey+1)
-		table.remove(stags,oldkey)
-		table.insert(stags,index,tag)
+		newkey = indexof(where)
 	end
-	capi.screen[s]:tags(stags)
-    -- Awesome BUG(?): Signal will be lost if one swap next two lines
+    if s == tag.screen  then
+        table.remove(stags,oldkey)
+        table.insert(stags,newkey,tag)
+        capi.screen[s]:tags(stags)
+    else
+        table.remove(stags,oldkey)
+        capi.screen[tag.screen]:tags(stags)
+        table.insert(dtags,newkey,tag)
+        capi.screen[s]:tags(dtags)
+    end
 	awesome.emit_signal("tagman::update", tag)
-	capi.client.focus = c
+    if c~= nil then 
+        capi.client.focus = c 
+    end
 end
 
 -- Adds a tag named @tn with props @props
+-- NOTE: those properties are not the same with awful.tag's
 function add(tn, props, s)
 	local props = props or {}
 	local s = s or client.focus and client.focus.screen or capi.mouse.screen
 	local tname = tostring(tn)
-	local tag = capi.tag {name = tname}
-	tag.screen = s
-	awful.layout.set(props.layout or awful.layout.suit.max, tag)
-	if props.setsel == true then tag.selected = true end
-	awesome.emit_signal("tagman::update", tag)
-	return tag
+    if tname == nil then return end
+	local t = awful.tag.add(tname)
+	t.screen = s
+	awful.layout.set(props.layout or awful.layout.suit.max, t)
+	if props.setsel == true then t.selected = true end
+	awesome.emit_signal("tagman::update", t)
+	return t
 end
 
--- Removes tag @tag. Move @tag's clients to another tag
-function del(tag, s)
-	local s = s or client.focus and client.focus.screen or capi.mouse.screen
-	local stags = capi.screen[s]:tags()
-	if #stags <= 1 then return end
-	if tag == stags[1] then awful.tag.viewnext() else awful.tag.viewprev() end
-	tag.screen = nil
-	awesome.emit_signal("tagman::update", tag)
-	--FIXME: When there were 2 tags, clients are dissapearing 
-	--insted of jumping to the last tag.
-	handle_orphans(s, awful.tag.selected(s))
+-- Removes tag @t. Move it's clients to tag @deft
+function del(tag,deft)
+    local s = tag.screen
+    local stags = capi.screen[s]:tags()
+    if #stags <= 1 then return end
+    local deft = deft or prev_to(tag)
+    if deft == nil then return end
+    tag.screen = nil
+    awesome.emit_signal("tagman::update", tag)
+    handle_orphans(s, deft)
 end
 
 -- Renames tag @tag with name @newname
