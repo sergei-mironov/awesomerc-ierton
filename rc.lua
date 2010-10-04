@@ -304,13 +304,17 @@ for s = 1, screen.count() do
 
     -- Create a taglist widget
     mytaglist[s] = awful.widget.taglist(s, 
-        awful.widget.taglist.filter.all, 
+        awful.widget.taglist.label.all, 
         mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(s, 
-        awful.widget.tasklist.filter.currenttags, 
-        mytasklist.buttons)
+    mytasklist[s] = awful.widget.tasklist(
+    function(c)
+        local text,bg,st,icon = awful.widget.tasklist.label.currenttags(c, s)
+        local usertext = awful.client.property.get(c, "name")
+        if text ~= nil and usertext ~= nil then text = usertext end
+        return text,bg,st,icon
+    end, mytasklist.buttons)
 
     -- Create top wibox
     mytop[s] = awful.wibox({ position = "top", screen = s, })
