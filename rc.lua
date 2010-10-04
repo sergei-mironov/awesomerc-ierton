@@ -586,23 +586,30 @@ function chord_tags()
             mypromptbox[mouse.screen].widget, 
             function(newname) 
                 local t = myrc.tagman.add(newname) 
-                myrc.tagman.move(t, awful.tag.selected()) 
+                myrc.tagman.move(t, myrc.tagman.next_to(awful.tag.selected())) 
             end, 
             awful.completion.bash,
             awful.util.getdir("cache") .. "/tag_new")
         end},
 
         {{}, "d", "Delete current tag", function () 
-            myrc.tagman.del(awful.tag.selected()) 
+            local sel = awful.tag.selected()
+            local def = myrc.tagman.prev_to(sel)
+            myrc.tagman.del(sel,def) 
+            awful.tag.viewonly(def)
         end}, 
 
         {{}, "k", "Move tag right", function () 
-            myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(0))
+            local sel = awful.tag.selected()
+            local tgt = myrc.tagman.next_to(sel)
+            myrc.tagman.move(sel,tgt)
             return false
         end}, 
 
         {{}, "j", "Move tag left", function () 
-            myrc.tagman.move(awful.tag.selected(), myrc.tagman.getn(-2))
+            local sel = awful.tag.selected()
+            local tgt = myrc.tagman.prev_to(sel)
+            myrc.tagman.move(sel,tgt)
             return false
         end}
     }
