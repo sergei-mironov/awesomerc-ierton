@@ -12,6 +12,8 @@ iwgrab() {
     esac
 }
 
+trap "pkill -p $$" EXIT 
+
 iwgrab
 
 tail -F -n0 /var/log/messages | 
