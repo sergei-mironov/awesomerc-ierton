@@ -1,26 +1,25 @@
 #!/bin/sh
 
+# Determines current wireless protocol
+essid=`/sbin/iwconfig 2>/dev/null | awk -F '"' '{print $2}' | head -n 1`
+case "$essid" in
+"") echo ;;
+ *) echo "ESSID: $essid" ;;
+esac
+
 IFS=$'\n'
-IFACE=wlan0
-xpid=99999
-
-iwgrab() {
-    essid=`/sbin/iwconfig "$IFACE" | sed -n 's/.*ESSID:"\([^\"]\+\)"/\1/ p'`
-    case "$essid" in
-    "") echo ;;
-     *) echo "ESSID: $essid" ;;
-    esac
-}
-
-trap "pkill -p $$" EXIT 
-
-iwgrab
-
-tail -F -n0 /var/log/messages | 
-grep --line-buffered -E "$IFACE" | 
-while read l ; do
-    { ps | grep -q "$xpid" ; } && continue
-    { iwgrab ; sleep 4 ; iwgrab ; } &
-    xpid=$!
+# Regexp assumes that event desription contains first capital letter (A-Z) of line
+/sbin/iwevent 2>/dev/null | sed -u 's/[^A-Z]\+\(.*\)/\1/g' | while read ev ; do
+	case $ev in 
+		Set\ ESSID*)
+			ESSID=`echo $ev | awk -F '"' '{print $2}'`
+			;;
+		New\ Access\ Point/Cell\ address:Not-Associated*)
+			echo
+			;;
+		New\ Access\ Point/Cell\ address:*)
+			echo "ESSID: $ESSID"
+			;;
+	esac
 done
 
