@@ -1,5 +1,8 @@
 #!/bin/sh
 
+trap "pkill -P $$" SIGINT
+trap "pkill -P $$" EXIT
+
 # Determines current wireless protocol
 essid=`/sbin/iwconfig 2>/dev/null | awk -F '"' '{print $2}' | head -n 1`
 case "$essid" in
