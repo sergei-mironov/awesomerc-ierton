@@ -139,7 +139,8 @@ env = {
     run = "gmrun",
     locker = "xscreensaver-command -lock",
     xkill = "xkill",
-    shutdown = "urxvt -e " .. awful.util.getdir("config").."/shutdown"
+    shutdown = "sudo /sbin/poweroff",
+	hibernate = "sudo /usr/sbin/pm-hibernate"
 }
 
 -- Pipelets
@@ -216,6 +217,8 @@ mysystray = widget({ type = "systray" })
 mytop = {}
 mybottom = {}
 mypromptbox = {}
+
+mybottom_enabled = beautiful.wibox_bottom_enabled or "yes"
 
 -- Clock
 mytextclock = {}
@@ -317,7 +320,8 @@ for s = 1, screen.count() do
     end, mytasklist.buttons)
 
     -- Create top wibox
-    mytop[s] = awful.wibox({ position = "top", screen = s, })
+    mytop[s] = awful.wibox({ 
+		position = "top", screen = s, height = beautiful.wibox_height })
     mytop[s].widgets = {
         mylauncher,
         mylayoutbox[s],
@@ -333,19 +337,21 @@ for s = 1, screen.count() do
         height = mytop[s].height
 	}
 
-    -- Create bottom wibox
-    mybottom[s] = awful.wibox({ 
-        position = "bottom", screen = s, height = beautiful.wibox_bottom_height})
-    mybottom[s].widgets = {
-        {
-            mykbdbox,
-            layout = awful.widget.layout.horizontal.rightleft
-        },
-        mybatbox,
-        mymountbox,
-        mywifibox,
-        layout = awful.widget.layout.horizontal.leftright
-    }
+	if mybottom_enabled == "yes" then
+		-- Create bottom wibox
+		mybottom[s] = awful.wibox({ 
+			position = "bottom", screen = s, height = beautiful.wibox_bottom_height })
+		mybottom[s].widgets = {
+			{
+				mykbdbox,
+				layout = awful.widget.layout.horizontal.rightleft
+			},
+			mybatbox,
+			mymountbox,
+			mywifibox,
+			layout = awful.widget.layout.horizontal.leftright
+		}
+	end
 
 end
 -- }}}

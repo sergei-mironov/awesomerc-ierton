@@ -33,10 +33,17 @@ function build()
     local fileman = env.fileman or "xterm -e mc"
     local xkill = env.xkill or "xkill" .. " "
     local shutdown = env.shutdown or nil
+    local hibernate = env.hibernate or nil
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
     freedesktop_utils.icon_sizes = {beautiful.icon_theme_size}
+
+	local myquitmenu = {
+        { "Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
+        { "Hibernate", hibernate }, 
+        { "Logout", awesome.quit }, 
+	}
 
     local myawesomemenu = { 
         { "Themes", themes.menu() }, 
@@ -47,7 +54,7 @@ function build()
             freedesktop_utils.lookup_icon({ icon = 'package_settings' }) 
         },
         { "Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'gtk-refresh' }) },
-        { "Stop", awesome.quit, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) } 
+        { "Stop", awesome.quit } 
     }
 
     local mymainmenu_items_head = {
@@ -55,14 +62,15 @@ function build()
         { "Terminal", terminal, freedesktop_utils.lookup_icon({icon = 'terminal'}) },
         { "File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
         { "Browser", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
-        { "", nil, nil} --separator
+        { "", nil, nil}, --separator
     }
 
     local mymainmenu_items_tail = {
         { "", nil, nil}, --separator
         { "Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
         { "Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
-        { "Quit", shutdown, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })},
+        { "", nil, nil}, --separator
+        { "Quit", myquitmenu, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) },
     }
 
     local mymainmenu_items = {}
