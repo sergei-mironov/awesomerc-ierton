@@ -32,8 +32,9 @@ function build()
     local run = (env.run or "gmrun")
     local fileman = env.fileman or "xterm -e mc"
     local xkill = env.xkill or "xkill" .. " "
-    local shutdown = env.shutdown or nil
+    local poweroff = env.poweroff or "sudo /sbin/poweroff"
     local hibernate = env.hibernate or nil
+    local reboot = env.reboot or "sudo /sbin/reboot"
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -41,6 +42,7 @@ function build()
 
 	local myquitmenu = {
         { "Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
+        { "Reboot", reboot }, 
         { "Hibernate", hibernate }, 
         { "Logout", awesome.quit }, 
 	}

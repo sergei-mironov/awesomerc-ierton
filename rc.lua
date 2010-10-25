@@ -139,8 +139,9 @@ env = {
     run = "gmrun",
     locker = "xscreensaver-command -lock",
     xkill = "xkill",
-    shutdown = "sudo /sbin/poweroff",
-	hibernate = "sudo /usr/sbin/pm-hibernate"
+    poweroff = "sudo /sbin/poweroff",
+    reboot = "sudo /sbin/reboot",
+    hibernate = "sudo /usr/sbin/pm-hibernate"
 }
 
 -- Pipelets
