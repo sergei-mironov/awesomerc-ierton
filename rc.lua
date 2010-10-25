@@ -328,11 +328,11 @@ for s = 1, screen.count() do
         mylayoutbox[s],
         mytaglist[s],
         mypromptbox[s],
-		{
-            mytextclock,
+        {
             s == 1 and mysystray or nil,
+            mytextclock,
             layout = awful.widget.layout.horizontal.rightleft
-		},
+        },
         mytasklist[s],
         layout = awful.widget.layout.horizontal.leftright,
         height = mytop[s].height
