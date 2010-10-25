@@ -408,22 +408,19 @@ for s = 1, screen.count() do
         height = mytop[s].height
 	}
 
-	if mybottom_enabled == "yes" then
-		-- Create bottom wibox
-		mybottom[s] = awful.wibox({ 
-			position = "bottom", screen = s, height = beautiful.wibox_bottom_height })
-		mybottom[s].widgets = {
-			{
-				mykbdbox,
-				layout = awful.widget.layout.horizontal.rightleft
-			},
-			mybatbox,
-			mymountbox,
-			mywifibox,
-			layout = awful.widget.layout.horizontal.leftright
-		}
-	end
-
+    -- Create bottom wibox
+    mybottom[s] = awful.wibox({ 
+        position = "bottom", screen = s, height = beautiful.wibox_bottom_height })
+        mybottom[s].widgets = {
+            {
+                mykbdbox,
+                layout = awful.widget.layout.horizontal.rightleft
+            },
+            mybatbox,
+            mymountbox,
+            mywifibox,
+            layout = awful.widget.layout.horizontal.leftright
+        }
 end
 -- }}}
 
