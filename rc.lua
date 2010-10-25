@@ -68,25 +68,46 @@ function client_adjust_bwidth(c)
     end
 end
 
+-- where can be 'left' 'right' 'center' nil
+function client_snap(c, where, geom)
+    local sg = screen[c.screen].geometry
+    local cg = geom or c:geometry()
+    local cs = c:struts()
+    cs['left'] = 0
+    cs['top'] = 0
+    cs['bottom'] = 0
+    cs['right'] = 0
+    if where == 'right' then
+        cg.x = sg.width - cg.width
+        cs[where] = cg.width
+        c:struts(cs)
+        c:geometry(cg)
+    elseif where == 'left' then
+        cg.x = 0
+        cs[where] = cg.width
+        c:struts(cs)
+        c:geometry(cg)
+    elseif where == nil then
+        c:struts(cs)
+        c:geometry(cg)
+    elseif where == 'center' then
+        c:struts(cs)
+        awful.placement.centered(c)
+    else
+        return
+    end
+end
+
 function save_geometry(c, g)
 	myrc.memory.set("geometry", client_name(c), g)
-	c:geometry(g)
+    if g ~= nil then
+        c:geometry(g)
+    end
 end
 
 function save_floating(c, f)
 	myrc.memory.set("floating", client_name(c), f)
     awful.client.floating.set(c, f)
-end
-
-function save_centered(c, val)
-	if val == true then
-        save_floating(c, true)
-		awful.placement.centered(c)
-        save_geometry(c, c:geometry())
-    else
-        save_floating(c, false)
-	end
-	return val
 end
 
 function save_titlebar(c, val)
@@ -115,6 +136,55 @@ end
 function get_tag(c, def)
 	local tn = myrc.memory.get("tags", client_name(c), def)
 	return myrc.tagman.find(tn)
+end
+
+function save_dockable(c, val)
+	myrc.memory.set("dockable", client_name(c), val)
+    awful.client.dockable.set(c, val)
+end
+
+function get_dockable(c, def)
+	return myrc.memory.get("dockable", client_name(c), def)
+end
+
+function save_hor(c, val)
+	myrc.memory.set("maxhor", client_name(c), val)
+    c.maximized_horizontal = val
+end
+
+function get_hor(c, def)
+	return myrc.memory.get("maxhor", client_name(c), def)
+end
+
+function save_vert(c, val)
+	myrc.memory.set("maxvert", client_name(c), val)
+    c.maximized_vertical = val
+end
+
+function get_vert(c, def)
+	return myrc.memory.get("maxvert", client_name(c), def)
+end
+
+function save_snap(c, val)
+	myrc.memory.set("snap", client_name(c), val)
+    client_snap(c, val)
+end
+
+function get_snap(c, def)
+	return myrc.memory.get("snap", client_name(c), def)
+end
+
+function save_border(c, val)
+	myrc.memory.set("border", client_name(c), val)
+    if val ~= nil then
+        c.border_width = val
+    else
+        c.border_width = beautiful.border_width
+    end
+end
+
+function get_border(c, def)
+	return myrc.memory.get("border", client_name(c), def)
 end
 --}}}
 
@@ -474,25 +544,60 @@ function chord_client(c)
             save_floating(c, not (awful.client.floating.get(c) or false))
         end},
 
-        {{}, "c", "Set centered on", function () 
-            save_centered(c, true)
+        {{}, "d", "Set dockable On", function () 
+            save_dockable(c, true)
         end},
 
-        {{"Shift"}, "c", "Set centered off", function () 
-            save_centered(c, false)
+        {{"Shift"}, "d", "Set dockable Off", function () 
+            save_dockable(c, false)
         end},
 
         {{}, "t", "Toggle titlebar", function () 
             save_titlebar(c, not get_titlebar(c, false)) 
         end},
 
-        {{}, "g", "Save geometry", function () 
+        {{}, "g", "Geometry save", function () 
             save_geometry(c, c:geometry())
         end},
 
-        {{}, "f", "Toggle fullscreen", function () 
-            c.maximized_horizontal = not c.maximized_horizontal
-            c.maximized_vertical   = not c.maximized_vertical
+        {{}, "g", "Geometry clear", function () 
+            save_geometry(c, nil)
+        end},
+
+        {{}, "v", "Toggle fullscreen VERT", function () 
+            save_vert(c, not c.maximized_vertical) 
+        end},
+
+        {{}, "h", "Toggle fullscreen HOR", function () 
+            save_hor(c, not c.maximized_horizontal) 
+        end},
+
+        {{}, "s", "Snap CENTER", function () 
+            save_snap(c, 'center')
+        end},
+
+        {{}, "s", "Snap RIGHT", function () 
+            save_snap(c, 'right')
+        end},
+
+        {{}, "s", "Snap LEFT", function () 
+            save_snap(c, 'left')
+        end},
+
+        {{}, "s", "Snap OFF", function () 
+            save_snap(c, nil)
+        end},
+
+        {{}, "b", "Border ZERO", function () 
+            save_border(c, 0)
+        end},
+
+        {{}, "b", "Border ONE", function () 
+            save_border(c, 1)
+        end},
+
+        {{}, "b", "Border DEF", function () 
+            save_border(c, nil)
         end},
 
         {{}, "r", "Rename", function () 
@@ -747,21 +852,47 @@ client.add_signal("manage", function (c, startup)
 
     local name = client_name(c)
     if c.type == "dialog" then 
-        save_centered(c, true)
+        save_snap(c, 'center')
+    end
+
+    local tag = get_tag(c, nil)
+    if tag ~= nil then
+        awful.client.movetotag(tag, c)
     end
 
     local floating = myrc.memory.get("floating", name)
     if floating ~= nil then 
         awful.client.floating.set(c, floating)
+    else
+        floating = awful.client.floating.get(c)
     end
-    local floating = awful.client.floating.get(c)
-    local geom = myrc.memory.get("geometry", name)
-    if (geom ~= nil) and (floating==true) then
-        c:geometry(geom)
+
+    local bwidth = get_border(c, nil)
+    if bwidth ~= nil then
+        c.border_width = bwidth
     end
-    local tag = get_tag(c, nil)
-    if tag then
-        awful.client.movetotag(tag, c)
+
+    if floating == true then
+        local dock = get_dockable(c, nil)
+        if dock ~= nil then
+            awful.client.dockable.set(c, dock)
+        end
+        local geom = myrc.memory.get("geometry", name)
+        if geom ~= nil then
+            c:geometry(geom)
+        end
+        local maxhor = get_hor(c, nil)
+        if maxhor ~= nil then
+            c.maximized_horizontal = maxhor
+        end
+        local maxvert = get_vert(c, nil)
+        if maxvert ~= nil then
+            c.maximized_vertical = maxvert
+        end
+        local snap = get_snap(c, nil)
+        if snap ~= nil then
+            client_snap(c, snap, geom)
+        end
     end
 
     -- Set key bindings
