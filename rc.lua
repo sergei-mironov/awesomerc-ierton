@@ -58,16 +58,6 @@ function client_name(c)
 	return cls..":"..inst..":"..role..":"..ctype
 end
 
-function client_adjust_bwidth(c)
-    if awful.client.floating.get(c) == false and 
-       awful.layout.get() == awful.layout.suit.max
-    then
-        c.border_width = 0
-    else
-        c.border_width = beautiful.border_width
-    end
-end
-
 -- where can be 'left' 'right' 'center' nil
 function client_snap(c, where, geom)
     local sg = screen[c.screen].geometry
@@ -174,17 +164,23 @@ function get_snap(c, def)
 	return myrc.memory.get("snap", client_name(c), def)
 end
 
-function save_border(c, val)
-	myrc.memory.set("border", client_name(c), val)
-    if val ~= nil then
-        c.border_width = val
+function get_border(c, def)
+	return myrc.memory.get("border", client_name(c), def)
+end
+
+function get_layout_border(c)
+    if awful.client.floating.get(c) == false and 
+        awful.layout.get() == awful.layout.suit.max
+    then
+        return 0
     else
-        c.border_width = beautiful.border_width
+        return get_border(c, beautiful.border_width)
     end
 end
 
-function get_border(c, def)
-	return myrc.memory.get("border", client_name(c), def)
+function save_border(c, val)
+    myrc.memory.set("border", client_name(c), val)
+    c.border_width = get_layout_border(c)
 end
 --}}}
 
@@ -845,7 +841,9 @@ client.add_signal("manage", function (c, startup)
         kill_mousemode_menu(mycontextmenu)
     end)
 
-    c:add_signal("property::floating", client_adjust_bwidth)
+	c:add_signal("property::floating", function(c) 
+        c.border_width = get_layout_border(c)
+	end)
 
     local name = client_name(c)
     if c.type == "dialog" then 
@@ -862,11 +860,6 @@ client.add_signal("manage", function (c, startup)
         awful.client.floating.set(c, floating)
     else
         floating = awful.client.floating.get(c)
-    end
-
-    local bwidth = get_border(c, nil)
-    if bwidth ~= nil then
-        c.border_width = bwidth
     end
 
     if floating == true then
@@ -903,6 +896,7 @@ client.add_signal("manage", function (c, startup)
 
     -- New client may not receive focus
     -- if they're not focusable, so set border anyway.
+    c.border_width = get_layout_border(c)
     c.border_color = beautiful.border_normal
     c.size_hints_honor = false
 
@@ -921,7 +915,7 @@ end)
 for s = 1, screen.count() do
     awful.tag.attached_add_signal(s,"property::layout", function()
         for _,c in pairs(awful.tag.selected():clients()) do
-            client_adjust_bwidth(c)
+            c.border_width = get_layout_border(c)
         end
     end)
 end
