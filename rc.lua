@@ -284,6 +284,16 @@ mysystray = widget({ type = "systray" })
 mytop = {}
 mybottom = {}
 mypromptbox = {}
+myclientmenu = {}
+myclientmenu.buttons = awful.util.table.join(
+awful.button({ }, 1, function ()
+    local c = client.focus
+    if not c then return end
+    if mycontextmenu then mycontextmenu:hide() end
+    local mp = mouse.coords()
+    mycontextmenu = myrc.keybind.chord_menu(chord_client(c))
+    mycontextmenu:show({coords = {x = mp.x-1*beautiful.menu_width/3, y = mp.y}})
+end))
 
 mybottom_enabled = beautiful.wibox_bottom_enabled or "yes"
 
@@ -386,6 +396,9 @@ for s = 1, screen.count() do
         return text,bg,st,icon
     end, mytasklist.buttons)
 
+    myclientmenu[s] = awful.widget.button({image = beautiful.awesome_icon})
+    myclientmenu[s]:buttons(myclientmenu.buttons)
+
     -- Create top wibox
     mytop[s] = awful.wibox({ 
 		position = "top", screen = s, height = beautiful.wibox_height })
@@ -397,6 +410,7 @@ for s = 1, screen.count() do
         {
             s == 1 and mysystray or nil,
             mytextclock,
+            myclientmenu[s],
             layout = awful.widget.layout.horizontal.rightleft
         },
         mytasklist[s],
