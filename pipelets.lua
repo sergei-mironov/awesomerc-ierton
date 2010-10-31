@@ -88,7 +88,7 @@ end
 
 -- # Acting functions
 function init()
-	awful.util.spawn(awful.util.getdir("config").."/pipeman "..config.script_path)
+	awful.util.spawn(awful.util.getdir("config").."/pipeman "..config.script_path, false)
 end
 
 local pipelets = {}
