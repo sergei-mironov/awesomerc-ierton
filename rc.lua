@@ -647,28 +647,28 @@ function chord_mpd()
         end},
 
         {{}, "p", "Play/pause", function () 
-            awful.util.spawn("mpc toggle")
+            awful.util.spawn("mpc toggle", false)
         end},
 
         {{}, "n", "Next", function () 
-            awful.util.spawn("mpc next")
+            awful.util.spawn("mpc next", false)
         end},
 
         {{"Shift"}, "n", "Prev", function () 
-            awful.util.spawn("mpc prev")
+            awful.util.spawn("mpc prev", false)
         end},
 
         {{}, "b", "Back", function () 
-            awful.util.spawn("mpc seek 0%")
+            awful.util.spawn("mpc seek 0%", false)
         end},
 
         {{}, "9", "Vol down", function () 
-            awful.util.spawn("mpc volume -5")
+            awful.util.spawn("mpc volume -5", false)
             return false
         end},
 
         {{}, "0", "Vol up", function () 
-            awful.util.spawn("mpc volume +5")
+            awful.util.spawn("mpc volume +5", false)
             return false
         end},
     }
