@@ -184,6 +184,133 @@ function save_border(c, val)
 end
 --}}}
 
+-- Menu helpers
+function menu_hide()
+    if mymenu ~= nil then
+        mymenu:hide()
+        mymenu = nil
+    end
+end
+
+function menu_current(menu, args)
+    if mymenu ~= nil then
+        mymenu:hide()
+    end
+    mymenu = menu
+    mymenu:show(args)
+    return mymenu
+end
+
+function client_contex_menu(c)
+    local mp = mouse.coords()
+    local menupos = {x = mp.x-1*beautiful.menu_width/3, y = mp.y}
+
+    local menuitmes = {
+        {"Cancel", function () 
+        end},
+
+        {"Close | [&c]", function () 
+            c:kill()
+        end},
+
+        {"Toggle floating | [&f]", function () 
+            save_floating(c, not (awful.client.floating.get(c) or false))
+        end},
+
+        {"Set dockable", {
+            { "On", function () 
+                save_dockable(c, true)
+            end},
+
+            {"Off", function () 
+                save_dockable(c, false)
+            end},
+        }},
+
+        {"Toggle titlebar", function () 
+            save_titlebar(c, not get_titlebar(c, false)) 
+        end},
+
+        {"Geometry", {
+            { "Save" , function () 
+                save_geometry(c, c:geometry())
+            end},
+
+            {"Clear", function () 
+                save_geometry(c, nil)
+            end},
+        }},
+
+        {"Toggle fullscreen VERT", function () 
+            save_vert(c, not c.maximized_vertical) 
+        end},
+
+        {"Toggle fullscreen HOR", function () 
+            save_hor(c, not c.maximized_horizontal) 
+        end},
+
+        {"Snap", {
+            { "CENTER", function () 
+                save_snap(c, 'center')
+            end},
+
+            {"RIGHT", function () 
+                save_snap(c, 'right')
+            end},
+
+            {"LEFT", function () 
+                save_snap(c, 'left')
+            end},
+
+            {"OFF", function () 
+                save_snap(c, nil)
+            end},
+        }},
+
+        {"Border", {
+            { "ZERO", function () 
+                save_border(c, 0)
+            end},
+
+            {"ONE", function () 
+                save_border(c, 1)
+            end},
+
+            {"DEF", function () 
+                save_border(c, nil)
+            end},
+        }},
+
+        {"Rename", function () 
+            awful.prompt.run(
+            { prompt = "Rename client: " }, 
+            mypromptbox[mouse.screen].widget, 
+            function(n) 
+                awful.client.property.set(c,"label", n) 
+            end,
+            awful.completion.bash,
+            awful.util.getdir("cache") .. "/rename")
+        end},
+
+        {"Stick", {
+            { "To this tag", 
+            function () 
+                local t = awful.tag.selected()
+                save_tag(c, t) 
+                naughty.notify({text = "Client " .. c.name .. " has been sticked to tag " .. t.name}) 
+            end}, 
+
+            {"To none", function () 
+                save_tag(c, nil) 
+                naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
+            end},
+        }},
+    } 
+
+    return awful.menu( { items = menuitmes, height = theme.menu_context_height } ), menupos
+end
+
+
 -- {{{ Variable definitions
 -- Default modkey.
 modkey = "Mod4"
@@ -246,9 +373,9 @@ awful.menu.menu_keys = {
 	close = { "Escape" }
 }
 
-chord_menu_args = {
+contextmenu_args = {
     coords={ x=0, y=0 },
-    keygrabber = false
+    keygrabber = true
 }
 
 mainmenu_args = {
@@ -275,7 +402,7 @@ mymainmenu = myrc.mainmenu.build()
 mylauncher = awful.widget.button({image = beautiful.awesome_icon})
 -- Main menu will be placed at left top corner of screen
 mylauncher:buttons(awful.util.table.join(mylauncher:buttons(), 
-    awful.button({}, 1, nil, function () mymainmenu:show(mainmenu_args) end)))
+    awful.button({}, 1, nil, function () menu_current(mymainmenu, mainmenu_args) end)))
 
 -- Create a systray
 mysystray = widget({ type = "systray" })
@@ -287,12 +414,9 @@ mypromptbox = {}
 myclientmenu = {}
 myclientmenu.buttons = awful.util.table.join(
 awful.button({ }, 1, function ()
-    local c = client.focus
-    if not c then return end
-    if mycontextmenu then mycontextmenu:hide() end
-    local mp = mouse.coords()
-    mycontextmenu = myrc.keybind.chord_menu(chord_client(c))
-    mycontextmenu:show({coords = {x = mp.x-1*beautiful.menu_width/3, y = mp.y}})
+    if client.focus == nil then return end
+    local menu, coords = client_contex_menu(client.focus)
+    menu_current(menu, {coords = coords})
 end))
 
 mybottom_enabled = beautiful.wibox_bottom_enabled or "yes"
@@ -358,10 +482,8 @@ mytasklist.buttons = awful.util.table.join(
         client.focus:raise()
 	end),
 	awful.button({ }, 3, function (c) 
-        if mycontextmenu then mycontextmenu:hide() end
-        local mp = mouse.coords()
-        mycontextmenu = myrc.keybind.chord_menu(chord_client(c))
-        mycontextmenu:show({coords = {x = mp.x-1*beautiful.menu_width/3, y = mp.y}})
+        local menu, coords = client_contex_menu(c)
+        menu_current(menu, {coords = coords})
     end),
 	awful.button({ }, 4, function ()
 		awful.client.focus.byidx(1)
@@ -436,7 +558,7 @@ end
 
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
-    awful.button({ }, 3, function () mymainmenu:show() end),
+    awful.button({ }, 3, function () menu_current(mymainmenu) end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
 ))
@@ -528,107 +650,7 @@ function run_or_raise(cmd, properties)
         end
         return
     end
-    awful.util.spawn(cmd)
-end
-
-function chord_client(c)
-    return {
-        menu = {
-            height = theme.menu_context_height
-        },
-        naughty = {
-            title = "::Client::"
-        },
-
-        {{}, "Escape", "Cancel", function () 
-        end},
-
-        {{"Shift"}, "k", "Kill", function () 
-            c:kill()
-        end},
-
-        {{}, "l", "Toggle floating", function () 
-            save_floating(c, not (awful.client.floating.get(c) or false))
-        end},
-
-        {{}, "d", "Set dockable On", function () 
-            save_dockable(c, true)
-        end},
-
-        {{"Shift"}, "d", "Set dockable Off", function () 
-            save_dockable(c, false)
-        end},
-
-        {{}, "t", "Toggle titlebar", function () 
-            save_titlebar(c, not get_titlebar(c, false)) 
-        end},
-
-        {{}, "g", "Geometry save", function () 
-            save_geometry(c, c:geometry())
-        end},
-
-        {{}, "g", "Geometry clear", function () 
-            save_geometry(c, nil)
-        end},
-
-        {{}, "v", "Toggle fullscreen VERT", function () 
-            save_vert(c, not c.maximized_vertical) 
-        end},
-
-        {{}, "h", "Toggle fullscreen HOR", function () 
-            save_hor(c, not c.maximized_horizontal) 
-        end},
-
-        {{}, "s", "Snap CENTER", function () 
-            save_snap(c, 'center')
-        end},
-
-        {{}, "s", "Snap RIGHT", function () 
-            save_snap(c, 'right')
-        end},
-
-        {{}, "s", "Snap LEFT", function () 
-            save_snap(c, 'left')
-        end},
-
-        {{}, "s", "Snap OFF", function () 
-            save_snap(c, nil)
-        end},
-
-        {{}, "b", "Border ZERO", function () 
-            save_border(c, 0)
-        end},
-
-        {{}, "b", "Border ONE", function () 
-            save_border(c, 1)
-        end},
-
-        {{}, "b", "Border DEF", function () 
-            save_border(c, nil)
-        end},
-
-        {{}, "r", "Rename", function () 
-            awful.prompt.run(
-            { prompt = "Rename client: " }, 
-            mypromptbox[mouse.screen].widget, 
-            function(n) 
-                awful.client.property.set(c,"label", n) 
-            end,
-            awful.completion.bash,
-            awful.util.getdir("cache") .. "/rename")
-        end},
-
-        {{}, "s", "Stick to this tag", function () 
-            local t = awful.tag.selected()
-            save_tag(c, t) 
-            naughty.notify({text = "Client " .. c.name .. " has been sticked to tag " .. t.name}) 
-        end}, 
-
-        {{"Shift"}, "s", "Unstick from any tag", function () 
-            save_tag(c, nil) 
-            naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
-        end},
-    } 
+    awful.util.spawn(cmd, false)
 end
 
 function chord_mpd()
@@ -738,7 +760,9 @@ end
 globalkeys = awful.util.table.join(
 
     -- Main menu
-    awful.key({ altkey            }, "Escape", function() mymainmenu:show(mainmenu_args) end),
+    awful.key({ altkey            }, "Escape", function() 
+        menu_current(mymainmenu,mainmenu_args) 
+    end),
 
     -- Awesome control
     awful.key({ modkey, "Control" }, "q", awesome.quit),
@@ -822,7 +846,8 @@ clientkeys = awful.util.table.join(
 
     -- Client keys
     awful.key({ altkey ,        }, "3", function(c) 
-        myrc.keybind.push_menu(chord_client(c), chord_menu_args, c)
+        local menu = client_contex_menu(c)
+        menu_current(menu, contextmenu_args)
     end)
 )
 
@@ -847,13 +872,14 @@ end)
 -- Hook function to execute when a new client appears.
 client.add_signal("manage", function (c, startup)
 
-    c:add_signal("mouse::enter", function(c)
-        function kill_mousemode_menu(m) 
-            if m and (true ~= m.keygrabber) then m:hide() end 
-        end
-        kill_mousemode_menu(mymainmenu)
-        kill_mousemode_menu(mycontextmenu)
-    end)
+-- TODO: Handle menu closing on mouse movements
+--    c:add_signal("mouse::enter", function(c)
+--        function kill_mousemode_menu(m) 
+--            if m and (true ~= m.keygrabber) then m:hide() end 
+--        end
+--        kill_mousemode_menu(mymainmenu)
+--        kill_mousemode_menu(mycontextmenu)
+--    end)
 
 	c:add_signal("property::floating", function(c) 
         c.border_width = get_layout_border(c)
