@@ -4,6 +4,7 @@
 
 theme = {}
 theme.name = "blue-black-red"
+theme.shared = "/usr/local/share/awesome"
 theme.config = awful.util.getdir("config")
 theme.path = theme.config .. "/themes/" .. theme.name
 
@@ -31,9 +32,9 @@ theme.border_marked = "#A3BA8C"
 theme.taglist_bg_focus = "#990000"
 
 -- Display the taglist squares
-theme.taglist_squares_sel = "/usr/share/awesome/themes/default/taglist/squarefw.png"
-theme.taglist_squares_unsel = "/usr/share/awesome/themes/default/taglist/squarew.png"
-theme.tasklist_floating_icon = "/usr/share/awesome/themes/default/tasklist/floatingw.png"
+theme.taglist_squares_sel =     theme.shared .. "/themes/default/taglist/squarefw.png"
+theme.taglist_squares_unsel =   theme.shared .. "/themes/default/taglist/squarew.png"
+theme.tasklist_floating_icon =  theme.shared .. "/themes/default/tasklist/floatingw.png"
 
 -- Bottom wibox height
 theme.wibox_bottom_height = 17
@@ -45,7 +46,7 @@ theme.menu_bg_focus = "#7985A3"
 theme.menu_bg_normal = "#454545"
 theme.menu_border_color = "#7985A3"
 theme.menu_border_width = 0
-theme.menu_submenu_icon = "/usr/share/awesome/themes/default/submenu.png"
+theme.menu_submenu_icon = theme.shared .. "/themes/default/submenu.png"
 theme.menu_height   = 24
 theme.menu_width    = 200
 theme.menu_context_height = 20
@@ -84,17 +85,17 @@ theme.titlebar_maximized_button_focus_active = theme.path .. "/titlebar/maximize
 theme.wallpaper_cmd = { "awsetbg " .. theme.config .. "/wallpapers/bricks.png" }
 
 -- You can use your own layout icons like this:
-theme.layout_dwindle = "/usr/share/awesome/themes/default/layouts/dwindlew.png"
-theme.layout_fairh = "/usr/share/awesome/themes/default/layouts/fairhw.png"
-theme.layout_fairv = "/usr/share/awesome/themes/default/layouts/fairvw.png"
-theme.layout_floating = "/usr/share/awesome/themes/default/layouts/floatingw.png"
-theme.layout_magnifier = "/usr/share/awesome/themes/default/layouts/magnifierw.png"
-theme.layout_max = "/usr/share/awesome/themes/default/layouts/maxw.png"
-theme.layout_spiral = "/usr/share/awesome/themes/default/layouts/spiralw.png"
-theme.layout_tilebottom = "/usr/share/awesome/themes/default/layouts/tilebottomw.png"
-theme.layout_tileleft = "/usr/share/awesome/themes/default/layouts/tileleftw.png"
-theme.layout_tile = "/usr/share/awesome/themes/default/layouts/tilew.png"
-theme.layout_tiletop = "/usr/share/awesome/themes/default/layouts/tiletopw.png"
+theme.layout_dwindle =      theme.shared .. "/themes/default/layouts/dwindlew.png"
+theme.layout_fairh =        theme.shared .. "/themes/default/layouts/fairhw.png"
+theme.layout_fairv =        theme.shared .. "/themes/default/layouts/fairvw.png"
+theme.layout_floating =     theme.shared .. "/themes/default/layouts/floatingw.png"
+theme.layout_magnifier =    theme.shared .. "/themes/default/layouts/magnifierw.png"
+theme.layout_max =          theme.shared .. "/themes/default/layouts/maxw.png"
+theme.layout_spiral =       theme.shared .. "/themes/default/layouts/spiralw.png"
+theme.layout_tilebottom =   theme.shared .. "/themes/default/layouts/tilebottomw.png"
+theme.layout_tileleft =     theme.shared .. "/themes/default/layouts/tileleftw.png"
+theme.layout_tile =         theme.shared .. "/themes/default/layouts/tilew.png"
+theme.layout_tiletop =      theme.shared .. "/themes/default/layouts/tiletopw.png"
 
 --awesome_icon = "/usr/share/awesome/icons/awesome16.png"
 --awesome_icon = "/home/ierton/.config/awesome/icons/gnome-logout.png"
