@@ -37,7 +37,8 @@ theme.taglist_squares_unsel =   theme.shared .. "/themes/default/taglist/squarew
 theme.tasklist_floating_icon =  theme.shared .. "/themes/default/tasklist/floatingw.png"
 
 -- Bottom wibox height
-theme.wibox_bottom_height = 17
+theme.wibox_bottom_height = 14
+theme.wibox_height = 22
 
 -- Variables set for theming menu
 -- menu_[bg|fg]_[normal|focus]
