@@ -6,8 +6,19 @@ die() {
 	exit 1
 }
 
-SDIR=$1
-test -d "$SDIR" || die "'$SDIR' is not a dir"
+while test -n "$1" ; do
+    case $1 in
+        -k|--kill)
+        KILL=y
+        ;;
+        *)
+        SDIR=$1
+        test -d "$SDIR" || die "'$SDIR' is not a dir"
+        ;;
+    esac
+    shift
+done
+
 FNAME=pipelets.update
 test -n "$FNAME" || die "FNAME should be non-empty"
 
@@ -39,6 +50,8 @@ check_prog() {
 check_prog pkill
 check_prog awesome-client
 check_pid
+
+test "$KILL" = "y" && { cleanup; exit 0; }
 
 trap cleanup "EXIT"
 for s in `find "$SDIR" -type f -and -executable` ; do
