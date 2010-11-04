@@ -489,9 +489,7 @@ mytasklist.buttons = awful.util.table.join(
 		if not c:isvisible() then
 			awful.tag.viewonly(c:tags()[1])
 		end
-        if client.focus == c then 
-            awful.client.focus.history.previous()
-        else
+        if client.focus ~= c then 
             client.focus = c;
         end 
         client.focus:raise()
