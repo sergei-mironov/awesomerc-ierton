@@ -383,6 +383,11 @@ mainmenu_args = {
     keygrabber = true
 }
 
+chord_menu_args = {
+    coords={ x=0, y=0 },
+    keygrabber = true
+}
+
 myrc.memory.init()
 
 beautiful.init(myrc.themes.current())
