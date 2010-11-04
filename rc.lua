@@ -184,7 +184,8 @@ function save_border(c, val)
 end
 --}}}
 
--- Menu helpers
+-- Menu helpers--{{{
+mymenu = nil
 function menu_hide()
     if mymenu ~= nil then
         mymenu:hide()
@@ -193,7 +194,7 @@ function menu_hide()
 end
 
 function menu_current(menu, args)
-    if mymenu ~= nil then
+    if mymenu ~= nil and mymenu ~= menu then
         mymenu:hide()
     end
     mymenu = menu
@@ -308,8 +309,7 @@ function client_contex_menu(c)
     } 
 
     return awful.menu( { items = menuitmes, height = theme.menu_context_height } ), menupos
-end
-
+end--}}}
 
 -- {{{ Variable definitions
 -- Default modkey.
@@ -880,6 +880,10 @@ client.add_signal("manage", function (c, startup)
 --        kill_mousemode_menu(mymainmenu)
 --        kill_mousemode_menu(mycontextmenu)
 --    end)
+
+    c:add_signal("mouse::enter", function(c)
+        menu_hide()
+    end)
 
 	c:add_signal("property::floating", function(c) 
         c.border_width = get_layout_border(c)
