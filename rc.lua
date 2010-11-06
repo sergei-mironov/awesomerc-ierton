@@ -231,6 +231,15 @@ function get_snap(c, def)
 	return myrc.memory.get("snap", client_name(c), def)
 end
 
+function save_hidden(c, val)
+	myrc.memory.set("hidden", client_name(c), val)
+    c.skip_taskbar = val
+end
+
+function get_hidden(c, def)
+	return myrc.memory.get("hidden", client_name(c), def)
+end
+
 function get_border(c, def)
 	return myrc.memory.get("border", client_name(c), def)
 end
@@ -378,6 +387,15 @@ function client_contex_menu(c)
             {"To &none", function () 
                 save_tag(c, nil) 
                 naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
+            end},
+        }},
+
+        { "&I Hidden", {
+            {"&Enable", function () 
+                save_hidden(c, true) 
+            end},
+            {"&Disable" , function () 
+                save_hidden(c, false) 
             end},
         }},
 
@@ -954,6 +972,11 @@ client.add_signal("manage", function (c, startup)
         if snap ~= nil then
             client_snap(c, snap, geom)
         end
+    end
+
+    local hidme = get_hidden(c, nil)
+    if hidme ~= nil then
+        c.skip_taskbar = hidme
     end
 
     -- Set key bindings
