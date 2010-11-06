@@ -35,44 +35,45 @@ function build()
     local poweroff = env.poweroff or "sudo /sbin/poweroff"
     local hibernate = env.hibernate or nil
     local reboot = env.reboot or "sudo /sbin/reboot"
+    local rotate = env.rotate or nil
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
     freedesktop_utils.icon_sizes = {beautiful.icon_theme_size}
 
 	local myquitmenu = {
-        { "Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
-        { "Reboot", reboot }, 
-        { "Hibernate", hibernate }, 
-        { "Logout", awesome.quit }, 
+        { "&Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
+        { "&Reboot", reboot, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
+        { "&Hibernate", hibernate, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' }) }, 
+        { "&Logout", awesome.quit , freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
 	}
 
     local myawesomemenu = { 
-        { "Themes", themes.menu() }, 
-        { "Edit config", editor .. awful.util.getdir("config") .. "/rc.lua", 
-            freedesktop_utils.lookup_icon({ icon = 'package_settings' }) 
-        },
-        { "Edit theme", editor .. awful.util.getdir("config") .. "/current_theme" ,
-            freedesktop_utils.lookup_icon({ icon = 'package_settings' }) 
-        },
-        { "Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'gtk-refresh' }) },
-        { "Stop", awesome.quit } 
+        { "&Themes", themes.menu(), 
+            freedesktop_utils.lookup_icon({ icon = 'wallpaper' }) }, 
+        { "&Restart", awesome.restart, freedesktop_utils.lookup_icon({ icon = 'reload' }) },
+        { "&Stop", awesome.quit, freedesktop_utils.lookup_icon({ icon = 'stop' }) } 
     }
 
     local mymainmenu_items_head = {
-        { "Awesome", myawesomemenu, beautiful.awesome_icon },
-        { "Terminal", terminal, freedesktop_utils.lookup_icon({icon = 'terminal'}) },
-        { "File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
-        { "Browser", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
+        { "&A Awesome", myawesomemenu, beautiful.awesome_icon },
+        { "&E Terminal", terminal, freedesktop_utils.lookup_icon({icon = 'terminal'}) },
+        { "&M File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
+        { "&F Firefox", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
         { "", nil, nil}, --separator
     }
 
     local mymainmenu_items_tail = {
         { "", nil, nil}, --separator
-        { "Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
-        { "Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
+        { "&R Rotate", {
+            {"&Normal", rotate .. " normal" , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
+            {"&Left",   rotate .. " left"   , freedesktop_utils.lookup_icon({icon = 'stock_left'})},
+            {"&Rigth",  rotate .. " right"  , freedesktop_utils.lookup_icon({icon = 'stock_right'})},
+        }, freedesktop_utils.lookup_icon({icon = 'reload'})},
+        { "&X Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
+        { "&U Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
         { "", nil, nil}, --separator
-        { "Quit", myquitmenu, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) },
+        { "&Q Quit", myquitmenu, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) },
     }
 
     local mymainmenu_items = {}

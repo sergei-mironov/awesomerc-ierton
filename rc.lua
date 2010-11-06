@@ -437,7 +437,8 @@ env = {
     xkill = "xkill",
     poweroff = "sudo /sbin/poweroff",
     reboot = "sudo /sbin/reboot",
-    hibernate = "sudo /usr/sbin/pm-hibernate"
+    hibernate = "sudo /usr/sbin/pm-hibernate",
+    rotate = "rotator"
 }
 
 -- Pipelets
@@ -657,7 +658,7 @@ for s = 1, screen.count() do
         return text,bg,st,icon
     end, mytasklist.buttons)
 
-    myclientmenu[s] = awful.widget.button({image = beautiful.awesome_icon})
+    myclientmenu[s] = awful.widget.button({image = beautiful.clientmenu_icon})
     myclientmenu[s]:buttons(myclientmenu.buttons)
 
     mykbd[s] = awful.widget.button({image = beautiful.xvkbd_icon})
