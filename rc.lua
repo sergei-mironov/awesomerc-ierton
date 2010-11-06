@@ -207,82 +207,110 @@ function client_contex_menu(c)
     local menupos = {x = mp.x-1*beautiful.menu_width/3, y = mp.y}
 
     local menuitmes = {
-        {"Cancel", function () 
-        end},
+        {"               ::: "..c.class.." :::" ,nil,nil}
+        ,
 
-        {"Close | [&c]", function () 
+        {"&Q Kill", function () 
             c:kill()
         end},
 
-        {"Toggle floating | [&f]", function () 
-            save_floating(c, not (awful.client.floating.get(c) or false))
-        end},
+        {"",nil,nil}
+        ,
 
-        {"Set dockable", {
-            { "On", function () 
-                save_dockable(c, true)
+        {"&F Floating", {
+            { "&Enable", function () 
+                save_floating(c, true)
+            end},
+            { "&Disable", function () 
+                save_floating(c, false)
+            end}
+        }},
+
+        {"&T Titlebar", {
+            { "&Enable" , function () 
+                save_titlebar(c, true)
             end},
 
-            {"Off", function () 
-                save_dockable(c, false)
+            {"&Disable", function () 
+                save_titlebar(c, false)
             end},
         }},
 
-        {"Toggle titlebar", function () 
-            save_titlebar(c, not get_titlebar(c, false)) 
-        end},
-
-        {"Geometry", {
-            { "Save" , function () 
+        {"&G Geometry", {
+            { "&Save" , function () 
                 save_geometry(c, c:geometry())
             end},
 
-            {"Clear", function () 
+            {"&Clear", function () 
                 save_geometry(c, nil)
             end},
         }},
 
-        {"Toggle fullscreen VERT", function () 
-            save_vert(c, not c.maximized_vertical) 
-        end},
+        {"&V Fullscreen vert", {
+            {"&Enable", function () 
+                save_vert(c, true) 
+            end},
+            {"&Disable" , function () 
+                save_vert(c, false) 
+            end},
+        }},
 
-        {"Toggle fullscreen HOR", function () 
-            save_hor(c, not c.maximized_horizontal) 
-        end},
+        {"&H Fullscreen hor", {
+            {"&Enable", function () 
+                save_hor(c, true) 
+            end},
+            {"&Disable" , function () 
+                save_hor(c, false) 
+            end},
+        }},
 
-        {"Snap", {
-            { "CENTER", function () 
+        {"&S Snap", {
+            { "&Center", function () 
                 save_snap(c, 'center')
             end},
 
-            {"RIGHT", function () 
+            {"&Right", function () 
                 save_snap(c, 'right')
             end},
 
-            {"LEFT", function () 
+            {"&Left", function () 
                 save_snap(c, 'left')
             end},
 
-            {"OFF", function () 
+            {"&Off", function () 
                 save_snap(c, nil)
             end},
         }},
 
-        {"Border", {
-            { "ZERO", function () 
+        {"&B Border", {
+            { "&None", function () 
                 save_border(c, 0)
             end},
 
-            {"ONE", function () 
+            {"&One", function () 
                 save_border(c, 1)
             end},
 
-            {"DEF", function () 
+            {"&Default", function () 
                 save_border(c, nil)
             end},
         }},
 
-        {"Rename", function () 
+        {"&S Stick", {
+            { "To &this tag", 
+            function () 
+                local t = awful.tag.selected()
+                save_tag(c, t) 
+                naughty.notify({text = "Client " .. c.name .. " has been sticked to tag " .. t.name}) 
+            end}, 
+
+            {"To &none", function () 
+                save_tag(c, nil) 
+                naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
+            end},
+        }},
+
+        {"&R Rename", function () 
             awful.prompt.run(
             { prompt = "Rename client: " }, 
             mypromptbox[mouse.screen].widget, 
@@ -292,20 +320,6 @@ function client_contex_menu(c)
             awful.completion.bash,
             awful.util.getdir("cache") .. "/rename")
         end},
-
-        {"Stick", {
-            { "To this tag", 
-            function () 
-                local t = awful.tag.selected()
-                save_tag(c, t) 
-                naughty.notify({text = "Client " .. c.name .. " has been sticked to tag " .. t.name}) 
-            end}, 
-
-            {"To none", function () 
-                save_tag(c, nil) 
-                naughty.notify({text = "Client " .. c.name .. " has been unsticked from tag"}) 
-            end},
-        }},
     } 
 
     return awful.menu( { items = menuitmes, height = theme.menu_context_height } ), menupos
