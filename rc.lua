@@ -519,12 +519,21 @@ mysystray = widget({ type = "systray" })
 mytop = {}
 mybottom = {}
 mypromptbox = {}
+
 myclientmenu = {}
+myclientmenu.timer = timer{ timeout=0.7 }
+myclientmenu.timer:add_signal("timeout", function() 
+    myclientmenu.suppress = nil 
+    myclientmenu.timer:stop()
+end)
 myclientmenu.buttons = awful.util.table.join(
 awful.button({ }, 1, function ()
+    if myclientmenu.suppress ~= nil then return end
     if client.focus == nil then return end
     local menu, coords = client_contex_menu(client.focus)
     menu_current(menu, {coords = coords})
+    myclientmenu.suppress = true
+    myclientmenu.timer:start()
 end))
 
 -- Clock
