@@ -1,29 +1,23 @@
 #!/bin/sh
 
+trap "pkill -P $$" SIGINT
+trap "pkill -P $$" EXIT
+
 parse() {
-	awk '{print $3}' | grep -v -E '/proc|/dev|/bus|/sys|/lib' | grep -w -v /
+	awk '{print $2}' | grep -v -E '/proc|/dev|/bus|/sys|/lib' | grep -w -v /
 }
 
+while true ; do
+    for m in `cat /proc/mounts | parse` ; do
+        printf "[%s] " `basename $m`
+    done
+    echo
 
-supply() {
-	exec tail -n0 -F "/var/log/messages" 
-}
-
-filter() {
-	echo "wake"
-	exec grep --line-buffered "mount"
-}
-
-process() {
-	while read x ; do
-		for m in `mount | parse` ; do
-			printf "[%s] " `basename $m`
-		done
-		echo
-	done
-}
-
-{ supply | filter | process ; } &
-trap "pkill -P $!" EXIT
-wait
+    if [ -e /usr/bin/inotifywait ] ; then
+        /usr/bin/inotifywait /etc/mtab >/dev/null 2>&1
+        sleep 0.2
+    else
+        sleep 20
+    fi
+done
 
