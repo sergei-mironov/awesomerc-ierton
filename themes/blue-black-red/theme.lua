@@ -34,7 +34,7 @@ theme.taglist_bg_focus = "#990000"
 -- Display the taglist squares
 theme.taglist_squares_sel =     theme.shared .. "/themes/default/taglist/squarefw.png"
 theme.taglist_squares_unsel =   theme.shared .. "/themes/default/taglist/squarew.png"
-theme.tasklist_floating_icon =  theme.shared .. "/themes/default/tasklist/floatingw.png"
+theme.tasklist_floating_icon =  nil -- theme.shared .. "/themes/default/tasklist/floatingw.png"
 
 -- Bottom wibox height
 theme.wibox_bottom_height = 14
