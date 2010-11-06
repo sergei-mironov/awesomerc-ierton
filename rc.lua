@@ -438,18 +438,6 @@ awful.button({ }, 1, function ()
     menu_current(menu, {coords = coords})
 end))
 
-myclientclose = {}
-myclientclose.timer = timer{ timeout=0.7 }
-myclientclose.timer:add_signal("timeout", function() myclientclose.suppress = nil end)
-myclientclose.buttons = awful.util.table.join(
-awful.button({ }, 1, function ()
-    if client.focus == nil then return end
-    if myclientclose.suppress ~= nil then return end
-    client.focus:kill()
-    myclientclose.suppress = true
-    myclientclose.timer:start()
-end))
-
 -- Clock
 mytextclock = {}
 mytextclock = widget({ type = "textbox", align="right" })
@@ -494,7 +482,6 @@ mytaglist.buttons = awful.util.table.join(
 	awful.button({ }, 4, awful.tag.viewnext),
 	awful.button({ }, 5, awful.tag.viewprev) 
 )
-
 
 -- Tasklist
 mytasklist = {}
@@ -548,9 +535,6 @@ for s = 1, screen.count() do
     myclientmenu[s] = awful.widget.button({image = beautiful.awesome_icon})
     myclientmenu[s]:buttons(myclientmenu.buttons)
 
-    myclientclose[s] = awful.widget.button({image = beautiful.awesome_icon})
-    myclientclose[s]:buttons(myclientclose.buttons)
-
     -- Create top wibox
     mytop[s] = awful.wibox({ 
 		position = "top", screen = s, height = beautiful.wibox_height })
@@ -560,7 +544,6 @@ for s = 1, screen.count() do
         mytaglist[s],
         mypromptbox[s],
         {
-            myclientclose[s],
             myclientmenu[s],
             s == 1 and mysystray or nil,
             mytextclock,
