@@ -16,6 +16,6 @@ while true ; do
 
 	done
 
-	sleep 20
+	sleep 180
 done
 
