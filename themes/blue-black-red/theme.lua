@@ -98,9 +98,9 @@ theme.layout_tileleft =     theme.shared .. "/themes/default/layouts/tileleftw.p
 theme.layout_tile =         theme.shared .. "/themes/default/layouts/tilew.png"
 theme.layout_tiletop =      theme.shared .. "/themes/default/layouts/tiletopw.png"
 
---awesome_icon = "/usr/share/awesome/icons/awesome16.png"
---awesome_icon = "/home/ierton/.config/awesome/icons/gnome-logout.png"
 theme.awesome_icon = theme.config .. "/icons/im-aim.png"
+theme.clientmenu_icon = theme.shared .. "/icons/awesome16.png"
+theme.xvkbd_icon = theme.config .. "/icons/keyboard.png"
 
 -- look inside /usr/share/icons/, default: nil (don't use icon theme)
 theme.icon_theme = "Tango"
