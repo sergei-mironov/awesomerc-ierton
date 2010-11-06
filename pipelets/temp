@@ -1,0 +1,11 @@
+#!/bin/sh
+
+trap "pkill -P $$" SIGINT
+trap "pkill -P $$" EXIT
+
+while true ; do
+    echo -n "Core 0: "
+    sensors | grep 'Core 0' | awk '{print $3}'
+    sleep 60
+done
+

@@ -581,6 +581,10 @@ pipelets.register( mybatbox, "batmon")
 mykbdbox = widget({ type = "textbox", align="right" })
 pipelets.register_fmt( mykbdbox, "kbd", " $1 ")
 
+-- Temp
+mytemp = widget({ type = "textbox", align="right" })
+pipelets.register_fmt( mytemp, "temp", " $1 ")
+
 -- Wifi assoc ESSID
 mywifibox = widget({ type = "textbox", align="right" })
 pipelets.register_fmt( mywifibox, "wireless", "<span color='#4169E1'> $1</span>")
@@ -694,6 +698,7 @@ for s = 1, screen.count() do
             mykbd[s],
             layout = awful.widget.layout.horizontal.rightleft
         },
+        mytemp,
         mybatbox,
         mymountbox,
         mywifibox,
