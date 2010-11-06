@@ -536,6 +536,33 @@ awful.button({ }, 1, function ()
     myclientmenu.timer:start()
 end))
 
+-- On screen keyboard
+mykbd = {}
+mykbd.timer = timer{ timeout=0.7 }
+mykbd.timer:add_signal("timeout", function() 
+    mykbd.suppress = nil 
+    mykbd.timer:stop()
+end)
+mykbd.buttons = awful.util.table.join(
+awful.button({ }, 1, function ()
+    if mykbd.suppress ~= nil then return end
+    local clients = client.get()
+    local xvkbd = nil
+    for i, c in pairs(clients) do
+        if c.class == "XVkbd" then 
+            xvkbd = c 
+            break 
+        end
+    end
+    if xvkbd ~= nil then
+        awful.util.spawn("killall xvkbd", false)
+    else
+        awful.util.spawn("xvkbd", false)
+    end
+    mykbd.suppress = true
+    mykbd.timer:start()
+end))
+
 -- Clock
 mytextclock = {}
 mytextclock = widget({ type = "textbox", align="right" })
@@ -633,6 +660,9 @@ for s = 1, screen.count() do
     myclientmenu[s] = awful.widget.button({image = beautiful.awesome_icon})
     myclientmenu[s]:buttons(myclientmenu.buttons)
 
+    mykbd[s] = awful.widget.button({image = beautiful.xvkbd_icon})
+    mykbd[s]:buttons(mykbd.buttons)
+
     -- Create top wibox
     mytop[s] = awful.wibox({ 
 		position = "top", screen = s, height = beautiful.wibox_height })
@@ -655,16 +685,17 @@ for s = 1, screen.count() do
     -- Create bottom wibox
     mybottom[s] = awful.wibox({ 
         position = "bottom", screen = s, height = beautiful.wibox_bottom_height })
-        mybottom[s].widgets = {
-            {
-                mykbdbox,
-                layout = awful.widget.layout.horizontal.rightleft
-            },
-            mybatbox,
-            mymountbox,
-            mywifibox,
-            layout = awful.widget.layout.horizontal.leftright
-        }
+    mybottom[s].widgets = {
+        {
+            mykbdbox,
+            mykbd[s],
+            layout = awful.widget.layout.horizontal.rightleft
+        },
+        mybatbox,
+        mymountbox,
+        mywifibox,
+        layout = awful.widget.layout.horizontal.leftright
+    }
 end
 -- }}}
 
@@ -1003,7 +1034,15 @@ client.add_signal("manage", function (c, startup)
     c.border_color = beautiful.border_normal
     c.size_hints_honor = false
 
-    client.focus = c
+    if not c.skip_taskbar then
+        client.focus = c
+    end
+
+    -- XVkbd hack
+    if c.class == "XVkbd" then
+        local sg = screen[1].geometry
+        c.maximized_horizontal = sg.height > sg.width
+    end
 end)
 
 -- Signal from tagman lib. 
