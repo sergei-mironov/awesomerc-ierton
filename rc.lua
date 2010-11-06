@@ -137,6 +137,13 @@ function client_snap(c, where, geom)
         cs[where] = cg.width
         c:struts(cs)
         c:geometry(cg)
+    elseif where == 'bottom' then
+        awful.placement.centered(c)
+        cg = c:geometry()
+        cg.y = sg.height - cg.height - beautiful.wibox_bottom_height
+        cs[where] = cg.height + beautiful.wibox_bottom_height
+        c:struts(cs)
+        c:geometry(cg)
     elseif where == nil then
         c:struts(cs)
         c:geometry(cg)
@@ -335,6 +342,10 @@ function client_contex_menu(c)
 
             {"&Left", function () 
                 save_snap(c, 'left')
+            end},
+
+            {"&Bottom", function () 
+                save_snap(c, 'bottom')
             end},
 
             {"&Off", function () 
