@@ -654,7 +654,9 @@ for s = 1, screen.count() do
     function(c)
         local text,bg,st,icon = awful.widget.tasklist.label.currenttags(c, s)
         local usertext = awful.client.property.get(c, "name")
-        if text ~= nil and usertext ~= nil then text = usertext end
+        if text ~= nil then
+            if usertext ~= nil then text = usertext end
+        end
         return text,bg,st,icon
     end, mytasklist.buttons)
 
