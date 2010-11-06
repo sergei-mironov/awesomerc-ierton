@@ -1020,6 +1020,13 @@ client.add_signal("manage", function (c, startup)
         c.skip_taskbar = hidme
     end
 
+    local titlebar = get_titlebar(c,nil)
+    if titlebar == true then
+        awful.titlebar.add(c, { modkey = modkey })
+    else
+        awful.titlebar.remove(c)
+    end
+
     -- Set key bindings
     c:buttons(clientbuttons)
     c:keys(clientkeys)
