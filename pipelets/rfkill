@@ -1,0 +1,16 @@
+#!/bin/sh
+
+trap "pkill -P $$" SIGINT
+trap "pkill -P $$" EXIT
+
+RFKILL=/usr/sbin/rfkill
+WIFI_RFKILL_ID=2
+
+$RFKILL event | while read l ; do
+    echo -n "S:"
+    $RFKILL list $WIFI_RFKILL_ID | grep 'Soft' | awk -F ': ' '{printf("%s",$2)}'
+    echo -n " H:"
+    $RFKILL list $WIFI_RFKILL_ID | grep 'Hard' | awk -F ': ' '{printf("%s",$2)}'
+    echo
+done
+
