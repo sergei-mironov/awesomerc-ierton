@@ -419,7 +419,7 @@ end--}}}
 modkey = "Mod4"
 altkey = "Mod1"
 
--- Helper variables
+-- Environment programs
 env = {
     browser = "firefox ",
     man = "urxvt -e man ",
