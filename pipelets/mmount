@@ -3,18 +3,23 @@
 trap "pkill -P $$" SIGINT
 trap "pkill -P $$" EXIT
 
+INOWAIT=/usr/bin/inotifywait
+
 parse() {
-	awk '{print $2}' | grep -v -E '/proc|/dev|/bus|/sys|/lib' | grep -w -v /
+	cat /proc/mounts | 
+    awk '{print $2}' | 
+    grep -v -E '/proc|/dev|/bus|/sys|/lib' | 
+    grep -w -v /
 }
 
 while true ; do
-    for m in `cat /proc/mounts | parse` ; do
+    for m in `parse` ; do
         printf "[%s] " `basename $m`
     done
     echo
 
-    if [ -e /usr/bin/inotifywait ] ; then
-        /usr/bin/inotifywait /etc/mtab >/dev/null 2>&1
+    if [ -e $INOWAIT ] ; then
+        $INOWAIT /etc/mtab >/dev/null 2>&1
         sleep 0.2
     else
         sleep 20
