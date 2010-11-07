@@ -1,5 +1,40 @@
 Hi! This project grows from my attempt to setup awesome.
 
+INSTALL
+=======
+
+0. Config set uses lots of third-party programs. Here is some of them:
+
+* rfkill
+* inotail
+* sensors
+* iwevent
+* inotifywait
+* pkill
+* acpitool
+* notify-send
+* xkb-switch (see http://git.ierton.ru)
+* Search for "Environment programs" in rc.lua for more
+* xvkbd for laptop branch
+
+and some well-known files
+
+* /var/log/messages (logger should be configureg to not flood it)
+* /proc/mounts
+* /etc/mtab
+
+Also rfkill pipelet uses hardcoded WIFI_RFKILL_ID value. Change it to one your
+wifi card uses (see rfkill list). Well, all pipelets are hackish a bit .
+
+1. git clone git://ierton.ru/awesomerc
+
+Server may be inaccessible sometimes:( Just wait few hours.
+
+2. mv ~/.config/awesome ~/.config/awesome.old
+
+3. ln -s `pwd`/awesomerc ~/.config/awesome
+
+
 DIRECTORY STRUCTURE
 ===================
 
@@ -8,8 +43,7 @@ The directory structure of config:
 |-- README                          This file
 |-- freedesktop                     Freedesktop-menu from Gustavo Dutra.
 |                                   http://github.com/terceiro/awesome-freedesktop/tree
-|-- icons                           Some common icons for theme
-|-- memory.data
+|-- memory.data                     This is kind a DB or "registry" to store client settings
 |-- myrc                            Directory with my config libs
 |   |-- keybind.lua                 Library for defining key sequence
 |   |-- mainmenu.lua                Main menu generator
@@ -23,31 +57,29 @@ The directory structure of config:
 |   |-- blue-black-red              My current theme files are here
 |   |   |-- theme.lua               My current theme config
 |   |   `-- titlebar
-|   |-- default -> /usr/share/awesome/themes/default
-|   |                               Default theme
-|   `-- sky -> /usr/share/awesome/themes/sky
+|   `-- ... more
 |                                   Another default theme
 |-- pipelets
 |   |-- date                        Russian-language date pipelet
 |   |-- mmount                      Mount info pipelet
-|   `-- batmon                      Battery info pipelet
+|   |-- batmon                      Battery info pipelet
+|   `-- more
 |-- tsave.lua -> table.save-0.94.lua
 |                                   Main thing for registry to work
+|-- icons                           Some common icons
 `-- wallpapers                      Wallpaper collection
-    `-- vladstudio-1.jpg
 
 PIPELETS
 ========
 
 This config uses pipelets to post some information into widgets.
-pipelet is a program (sh script), which is "conected" 
+pipelet is a program (shell script), which is "conected" 
 with widget via pipe. 
 
-All plumbery is hidden in pipeman script. It translates stdout
+All plumbery is hidden in the ./pipeman script. It translates stdout
 of its children into awesome calls.
 
-See rc.lua for details.
-
+See rc.lua for details and examples.
 
 DEFAULT KEYBINDINGS
 ===================
@@ -57,16 +89,12 @@ Here are some default bindings:
 Client keys
 -----------
 
-altkey+` - show client context menu
-Ctrl+modkey+d - start client settings chord
-Ctrl+modkey+d,c - Center client
-Ctrl+modkey+d,l - Toggle client to be floating
-Ctrl+modkey+d,d - Rename a client (set new title)
-and so on (read tooltip)
-
 altkey+1 - prev client
+altkey+j - prev client
 altkey+2 - next client
+altkey+k - next client
 altkey+tab - toggle last 2 active clients
+altkey+3 - begin client manipulation menu (tooltip will appear)
 
 Tag keys
 --------
@@ -76,37 +104,28 @@ altkey+F2 - jump to one tag right
 modkey+F1 - move focused client one tag left
 modkey+F2 - move focused client one tag right
 modkey+tab - switch to previous tag
+altkey+F3 - begin tag manipulation menu (tooltip will appear)
 
-Crtl+modkey+s - begin tag manipulation chord (tooltip will appear)
-Crtl+modkey+s,s - rename current tag
-Crtl+modkey+s,c - create a tag
-Crtl+modkey+s,d - delete current tag
-and so on
-
-Menus
+Other
 -----
 
 altkey+Esc - show main menu
-altkey+` - show client menu
+altkey+e - begin mpd manipulation menu (tooltip will appear)
 
-There are vim keybindings defined for menus 
+There are vim style keybindings defined for menus 
 (hjkl - move, o - open, x - back, Enter - open)
-
-Mail bugs/patches to ierton@gmail.com.
 
 
 TODO 
 ====
 
 *) Add client reordering
-*) Add google/wiki search bar
-*) Add mpd controls
 *) Implement M$Windows alt+tab functionality (don't know how to 
    capture altkey release event)
 *) Add some online translator support
 
 --
 Thanks for your interest! 
-Mail bugs and questions to ierton@gmail.com
+Please Mail bugs/patches to ierton@gmail.com.
 Sergey.
 
