@@ -1,4 +1,7 @@
 #!/bin/sh
+# 
+# NOTE: Script uses lots of data hardcoded for my own machine. Check iwevent
+# output and fix possible mismatches in 'case' below.
 
 trap "pkill -P $$" SIGINT
 trap "pkill -P $$" EXIT
