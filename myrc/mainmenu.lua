@@ -44,7 +44,7 @@ function build()
 	local myquitmenu = {
         { "&Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
         { "&Reboot", reboot, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
-        { "&Hibernate", hibernate, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' }) }, 
+        { "H&ibernate", hibernate, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' }) }, 
         { "&Logout", awesome.quit , freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
 	}
 
