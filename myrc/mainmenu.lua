@@ -70,6 +70,10 @@ function build()
             {"&Left",   rotate .. " left"   , freedesktop_utils.lookup_icon({icon = 'stock_left'})},
             {"&Rigth",  rotate .. " right"  , freedesktop_utils.lookup_icon({icon = 'stock_right'})},
         }, freedesktop_utils.lookup_icon({icon = 'reload'})},
+        { "&W Wifi", {
+            {"&Unblock", env.rfkill.unblock , freedesktop_utils.lookup_icon({icon = 'stock_up'})},
+            {"&Block",   env.rfkill.block   , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
+        }, freedesktop_utils.lookup_icon({icon = 'wicd-gtk'})},
         { "&X Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
         { "&U Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
         { "", nil, nil}, --separator

@@ -438,7 +438,8 @@ env = {
     poweroff = "sudo /sbin/poweroff",
     reboot = "sudo /sbin/reboot",
     hibernate = "sudo /usr/sbin/pm-hibernate",
-    rotate = "rotator"
+    rotate = "rotator",
+    rfkill = { block = "sudo rfkill block 2", unblock = "sudo rfkill unblock 2" }
 }
 
 -- Pipelets
