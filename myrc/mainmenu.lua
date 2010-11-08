@@ -77,7 +77,7 @@ function build()
         { "&X Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
         { "&U Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
         { "", nil, nil}, --separator
-        { "&Q Quit", myquitmenu, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) },
+        { "&P Power", myquitmenu, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) },
     }
 
     local mymainmenu_items = {}
