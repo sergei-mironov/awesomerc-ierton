@@ -439,7 +439,7 @@ env = {
     reboot = "sudo /sbin/reboot",
     hibernate = "sudo /usr/sbin/pm-hibernate",
     rotate = "rotator",
-    rfkill = { block = "sudo rfkill block 2", unblock = "sudo rfkill unblock 2" }
+    rfkill = { block = "sudo rfkill block 2", unblock = "sudo rfkill unblock 2" },
 }
 
 -- Pipelets
@@ -490,7 +490,7 @@ mainmenu_args = {
 
 chord_menu_args = {
     coords={ x=0, y=0 },
-    keygrabber = true
+    keygrabber = false
 }
 
 myrc.memory.init()
