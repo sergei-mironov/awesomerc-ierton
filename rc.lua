@@ -497,6 +497,10 @@ myrc.memory.init()
 
 beautiful.init(myrc.themes.current())
 
+-- Custom icons
+clientmenu_icon = beautiful.clientmenu_icon or beautiful.awesome_icon
+kbd_icon = beautiful.xvkbd_icon or beautiful.awesome_icon
+
 myrc.mainmenu.init(env)
 
 myrc.tagman.init(myrc.memory.get("tagnames", "-", nil))
@@ -669,10 +673,10 @@ for s = 1, screen.count() do
         return text,bg,st,icon
     end, mytasklist.buttons)
 
-    myclientmenu[s] = awful.widget.button({image = beautiful.clientmenu_icon})
+    myclientmenu[s] = awful.widget.button({image = clientmenu_icon})
     myclientmenu[s]:buttons(myclientmenu.buttons)
 
-    mykbd[s] = awful.widget.button({image = beautiful.xvkbd_icon})
+    mykbd[s] = awful.widget.button({image = kbd_icon})
     mykbd[s]:buttons(mykbd.buttons)
 
     -- Create top wibox
