@@ -36,6 +36,7 @@ function build()
     local hibernate = env.hibernate or nil
     local reboot = env.reboot or "sudo /sbin/reboot"
     local rotate = env.rotate or nil
+    local logout = env.logout or awesome.quit
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -45,7 +46,7 @@ function build()
         { "&Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
         { "&Reboot", reboot, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
         { "H&ibernate", hibernate, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' }) }, 
-        { "&Logout", awesome.quit , freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
+        { "&Logout", logout , freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
 	}
 
     local myawesomemenu = { 
