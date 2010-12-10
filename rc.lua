@@ -725,12 +725,7 @@ function switch_to_client(direction)
 	if direction == 0 then
 		awful.client.focus.history.previous()
 	else
-        if awful.layout.get() == awful.layout.suit.max then
-            awful.client.focus.byidx(direction);  
-        else
-            awful.client.cycle(direction == 1)
-            client.focus = awful.client.getmaster()
-        end
+        awful.client.focus.byidx(direction);  
 	end
 	if client.focus then client.focus:raise() end
 end
