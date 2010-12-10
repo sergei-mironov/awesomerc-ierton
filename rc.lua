@@ -503,7 +503,7 @@ kbd_icon = beautiful.xvkbd_icon or beautiful.awesome_icon
 
 myrc.mainmenu.init(env)
 
-myrc.tagman.init(myrc.memory.get("tagnames", "-", nil))
+myrc.tagman.init(function(s) return myrc.memory.get("tagnames", tostring(s), nil) end)
 
 myrc.logmon.init()
 
@@ -1074,8 +1074,8 @@ end)
 -- Handler will store tag names to registry.
 -- Those names will be used at next awesome start
 -- to recreate current tags.
-awesome.add_signal("tagman::update", function (t) 
-    myrc.memory.set("tagnames","-", myrc.tagman.names())
+awesome.add_signal("tagman::update", function (t, s) 
+    myrc.memory.set("tagnames", tostring(s), myrc.tagman.names())
 end)
 
 -- Will change border width for max layout
