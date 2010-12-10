@@ -663,14 +663,8 @@ for s = 1, screen.count() do
         mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(
-    function(c)
-        local text,bg,st,icon = awful.widget.tasklist.label.currenttags(c, s)
-        local usertext = awful.client.property.get(c, "name")
-        if text ~= nil then
-            if usertext ~= nil then text = usertext end
-        end
-        return text,bg,st,icon
+    mytasklist[s] = awful.widget.tasklist( function (c)
+        return awful.widget.tasklist.label.currenttags(c,s)
     end, mytasklist.buttons)
 
     myclientmenu[s] = awful.widget.button({image = clientmenu_icon})
