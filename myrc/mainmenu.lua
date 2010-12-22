@@ -41,6 +41,7 @@ function build()
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
     freedesktop_utils.icon_sizes = {beautiful.icon_theme_size}
+    freedesktop_utils.default_icon = beautiful.default_client_icon 
 
 	local myquitmenu = {
         { "&Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 

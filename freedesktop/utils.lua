@@ -8,6 +8,8 @@ module("freedesktop.utils")
 
 terminal = 'xterm'
 
+default_icon = ''
+
 icon_theme = nil
 
 all_icon_sizes = { 
@@ -75,6 +77,7 @@ function lookup_icon(arg)
                 return directory .. arg.icon .. '.png'
             end
         end
+        return default_icon
     end
 end
 
