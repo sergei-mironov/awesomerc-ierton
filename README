@@ -13,7 +13,7 @@ INSTALL
 * pkill
 * acpitool
 * notify-send
-* xkb-switch (see http://git.ierton.ru)
+* xkb-switch (see http://github.com/ierton/xkb-switch)
 * Search for "Environment programs" in rc.lua for more
 * xvkbd for laptop branch
 
@@ -26,13 +26,11 @@ and some well-known files
 Also rfkill pipelet uses hardcoded WIFI_RFKILL_ID value. Change it to one your
 wifi card uses (see rfkill list). Well, all pipelets are hackish a bit .
 
-1. git clone git://ierton.ru/awesomerc
-
-Server may be inaccessible sometimes:( Just wait few hours.
+1. git clone git@github.com:ierton/awesomerc-ierton.git
 
 2. mv ~/.config/awesome ~/.config/awesome.old
 
-3. ln -s `pwd`/awesomerc ~/.config/awesome
+3. ln -s `pwd`/awesomerc-ierton ~/.config/awesome
 
 
 DIRECTORY STRUCTURE
