@@ -33,10 +33,11 @@ function build()
     local fileman = env.fileman or "xterm -e mc"
     local xkill = env.xkill or "xkill" .. " "
     local poweroff = env.poweroff or "sudo /sbin/poweroff"
-    local hibernate = env.hibernate or nil
     local reboot = env.reboot or "sudo /sbin/reboot"
     local rotate = env.rotate or nil
     local logout = env.logout or awesome.quit
+    local suspend = env.suspend or "sudo /usr/sbin/pm-suspend"
+    local hibernate = env.hibernate or "sudo /usr/sbin/pm-hibernate"
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -47,6 +48,7 @@ function build()
         { "&Poweroff", poweroff, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
         { "&Reboot", reboot, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' })}, 
         { "H&ibernate", hibernate, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' }) }, 
+        { "&Suspend", suspend, freedesktop_utils.lookup_icon({ icon = 'system-shutdown' }) }, 
         { "&Logout", logout , freedesktop_utils.lookup_icon({ icon = 'gnome-logout' })}, 
 	}
 
