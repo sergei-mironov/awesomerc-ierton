@@ -97,34 +97,31 @@ function sort(s, fn)
 end
 
 -- Moves tag to position @where (if where is number) -OR- next
--- to tag @where (if where is object)
-function move(tag, where, s)
-	local s = s or tag.screen
+-- to tag @where (if @where is object)
+-- In latter case @where should be on the @tag's screen
+function move(tag, where)
 	local stags = capi.screen[tag.screen]:tags()
-    local dtags = nil
-    if s ~= tag.screen  then
-        dtags = capi.screen[s]:tags()
-    end
+    -- Current possition of the tag
 	local oldkey = indexof(tag)
-    local newkey = nil
     if oldkey == nil then return end
-	local c = capi.client.focus
+    -- New position of the tag
+    local newkey = nil
 	if type(where) == "number" then
-		newkey = awful.util.cycle(#dtags, where)
-	else --tag object
+		newkey = awful.util.cycle(#stags, where)
+	else
+        -- dest tag should be on the same screen with src
+        if where.screen ~= tag.screen then return end
+        -- expect a table (a tag)
 		newkey = indexof(where)
 	end
-    if s == tag.screen  then
-        table.remove(stags,oldkey)
-        table.insert(stags,newkey,tag)
-        capi.screen[s]:tags(stags)
-    else
-        table.remove(stags,oldkey)
-        capi.screen[tag.screen]:tags(stags)
-        table.insert(dtags,newkey,tag)
-        capi.screen[s]:tags(dtags)
-    end
-	awesome.emit_signal("tagman::update", tag)
+
+	local c = capi.client.focus
+
+    table.remove(stags,oldkey)
+    table.insert(stags,newkey,tag)
+    capi.screen[tag.screen]:tags(stags)
+
+	awesome.emit_signal("tagman::update", tag, tag.screen)
     if c~= nil then 
         capi.client.focus = c 
     end
@@ -141,41 +138,42 @@ function add(tn, props, s)
 	t.screen = s
 	awful.layout.set(props.layout or awful.layout.suit.max, t)
 	if props.setsel == true then t.selected = true end
-	awesome.emit_signal("tagman::update", t)
+	awesome.emit_signal("tagman::update", t, s)
 	return t
 end
 
 -- Removes tag @t. Move it's clients to tag @deft
-function del(tag,deft)
+function del(tag, deft)
     local s = tag.screen
     local stags = capi.screen[s]:tags()
     if #stags <= 1 then return end
     local deft = deft or prev_to(tag)
     if deft == nil then return end
     tag.screen = nil
-    awesome.emit_signal("tagman::update", tag)
+    awesome.emit_signal("tagman::update", tag, s)
     handle_orphans(s, deft)
 end
 
 -- Renames tag @tag with name @newname
-function rename(tag, newname, s)
+function rename(tag, newname)
 	tag.name = newname
-	awesome.emit_signal("tagman::update", tag)
+	awesome.emit_signal("tagman::update", tag, tag.screen)
 end
 
 -- Initializes the library. 
--- Creates tags with names from @namelist table
--- If @namelist is empty, creates tags 1..9
-function init(namelist)
-	if namelist == nil or #namelist == 0 then
-		namelist = {}
-		for i=1,9 do namelist[i] = tostring(i) end
-	end
-
+-- Creates a se of tags for each screen
+-- @name_getter is a function taking screen index and returning 
+-- a list of tag names.
+function init(name_getter)
 	for s = 1, capi.screen.count() do
+        local namelist = name_getter(s)
+        if namelist == nil or #namelist == 0 then
+            namelist = {}
+            for i=1,9 do namelist[i] = tostring(i) end
+        end
 		-- Each screen has its own tag table.
 		for i, name in ipairs(namelist) do 
-			add(name, { setsel=(i==1) } ) 
+			add(name, { setsel=(i==1) }, s) 
 		end
 	end
 end

@@ -503,7 +503,7 @@ kbd_icon = beautiful.xvkbd_icon or beautiful.awesome_icon
 
 myrc.mainmenu.init(env)
 
-myrc.tagman.init(myrc.memory.get("tagnames", "-", nil))
+myrc.tagman.init(function(s) return myrc.memory.get("tagnames", tostring(s), nil) end)
 
 myrc.logmon.init()
 
@@ -663,14 +663,8 @@ for s = 1, screen.count() do
         mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(
-    function(c)
-        local text,bg,st,icon = awful.widget.tasklist.label.currenttags(c, s)
-        local usertext = awful.client.property.get(c, "name")
-        if text ~= nil then
-            if usertext ~= nil then text = usertext end
-        end
-        return text,bg,st,icon
+    mytasklist[s] = awful.widget.tasklist( function (c)
+        return awful.widget.tasklist.label.currenttags(c,s)
     end, mytasklist.buttons)
 
     myclientmenu[s] = awful.widget.button({image = clientmenu_icon})
@@ -731,12 +725,7 @@ function switch_to_client(direction)
 	if direction == 0 then
 		awful.client.focus.history.previous()
 	else
-        if awful.layout.get() == awful.layout.suit.max then
-            awful.client.focus.byidx(direction);  
-        else
-            awful.client.cycle(direction == 1)
-            client.focus = awful.client.getmaster()
-        end
+        awful.client.focus.byidx(direction);  
 	end
 	if client.focus then client.focus:raise() end
 end
@@ -1074,8 +1063,8 @@ end)
 -- Handler will store tag names to registry.
 -- Those names will be used at next awesome start
 -- to recreate current tags.
-awesome.add_signal("tagman::update", function (t) 
-    myrc.memory.set("tagnames","-", myrc.tagman.names())
+awesome.add_signal("tagman::update", function (t, s) 
+    myrc.memory.set("tagnames", tostring(s), myrc.tagman.names())
 end)
 
 -- Will change border width for max layout
