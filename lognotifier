@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# Copyright (C) 2011 Sergey Mironov
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Name of script (for later parsing)
+this=$0
+
+# Log to watch
+log="/var/log/messages"
+
+# Icons
+infoIcon='/usr/share/icons/gnome/16x16/status/sunny.png'
+warningIcon='/usr/share/icons/gnome/16x16/status/dialog-warning.png'
+errorIcon='/usr/share/icons/gnome/16x16/status/dialog-error.png'
+securityIcon='/usr/share/icons/gnome/16x16/status/security-medium.png'
+
+die() {
+	echo $@ >&2
+	{ echo "critical" ; echo "$@" ; } | sender "Error"
+	exit
+}
+
+check_prog() {
+	which "$1" >/dev/null 2>&1 || die "Please install $1"
+}
+
+check_pid() {
+	local pidfile="$HOME/.lognotify.pid"
+	test -f "$pidfile" && 
+        pkill -P `cat $pidfile` &&
+        kill `cat $pidfile`
+	echo $$ > "$pidfile"
+}
+
+# Dependencies checking
+check_pid
+check_prog notify-send
+check_prog inotifywait
+check_prog pkill
+test -f $log || die "Unable to read $log"
+
+urgency="low"
+icon=$infoIcon
+tpopup=5000
+
+# Main part
+while true; do
+    inotifywait -q -q $log || die "inotifywait failed"
+    notify-send -u "$urgency" -t "$tpopup" -i "$icon" "$log" \
+        "<span color='#000000'>New records in log file</span>"
+    sleep 30
+done
+
+
