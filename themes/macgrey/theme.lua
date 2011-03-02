@@ -62,13 +62,16 @@ theme.taglist_squares_sel   = theme.shared .. "/themes/default/taglist/squarefw.
 theme.taglist_squares_unsel = theme.shared .. "/themes/default/taglist/squarew.png"
 
 -- MISC
-theme.wallpaper_cmd         = nil --{ "awsetbg /usr/local/share/awesome/themes/sky/sky-background.png" }
+theme.wallpaper_cmd = { "awsetbg " .. theme.config .. "/wallpapers/rocks.png" }
 theme.taglist_squares       = "true"
 theme.titlebar_close_button = "true"
 theme.menu_width            = "200"
 theme.menu_height           = 24
 theme.menu_context_height   = 20
 theme.menu_border_width     = 0
+
+theme.wibox_bottom_height = 14
+theme.wibox_height = 22
 
 -- Define the image to load
 theme.titlebar_close_button_normal = theme.shared .. "/themes/default/titlebar/close_normal.png"
