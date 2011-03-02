@@ -441,6 +441,7 @@ env = {
     suspend = "sudo /usr/sbin/pm-suspend",
     rotate = "rotator",
     rfkill = { block = "sudo rfkill block 0", unblock = "sudo rfkill unblock 0" },
+    syslog = "urxvt -e vim -T xterm-256color /var/log/messages"
 }
 
 -- Pipelets

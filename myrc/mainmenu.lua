@@ -38,6 +38,7 @@ function build()
     local logout = env.logout or awesome.quit
     local suspend = env.suspend or "sudo /usr/sbin/pm-suspend"
     local hibernate = env.hibernate or "sudo /usr/sbin/pm-hibernate"
+    local syslog = env.syslog or terminal .. " -e vim /var/log/messages"
 
     freedesktop_utils.terminal = terminal
     freedesktop_utils.icon_theme = beautiful.icon_theme 
@@ -69,6 +70,7 @@ function build()
 
     local mymainmenu_items_tail = {
         { "", nil, nil}, --separator
+        { "&S Syslog", syslog, freedesktop_utils.lookup_icon({ icon = "gnome-monitor"}) },
         { "&R Rotate", {
             {"&Normal", rotate .. " normal" , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
             {"&Left",   rotate .. " left"   , freedesktop_utils.lookup_icon({icon = 'stock_left'})},
