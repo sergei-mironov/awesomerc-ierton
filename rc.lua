@@ -594,11 +594,11 @@ pipelets.register_fmt( mytemp, "temp", " $1 ")
 
 -- RFKILL
 myrfkill = widget({ type = "textbox", align="right" })
-pipelets.register_fmt( myrfkill, "rfkill", "<span color='#41E169'> $1</span>")
+pipelets.register_fmt( myrfkill, "rfkill", "<span color='#336633'> $1</span>")
 
 -- Wifi assoc ESSID
 mywifibox = widget({ type = "textbox", align="right" })
-pipelets.register_fmt( mywifibox, "wireless", "<span color='#4169E1'> $1</span>")
+pipelets.register_fmt( mywifibox, "wireless", "<span color='#333366'> $1</span>")
 
 -- Layoutbox
 mylayoutbox = {}
