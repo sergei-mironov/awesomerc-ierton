@@ -452,7 +452,7 @@ naughty.config.presets.keybind = {
     position = 'top_left',
     timeout = 0,
 }
-logmon_width = 700
+logmon_width = 180
 naughty.config.position = 'top_right'
 naughty.config.presets.low.width = logmon_width
 naughty.config.presets.normal.width = logmon_width
