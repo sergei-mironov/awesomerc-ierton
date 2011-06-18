@@ -421,7 +421,7 @@ altkey = "Mod1"
 
 -- Environment programs
 env = {
-    browser = "firefox ",
+    browser = "chromium ",
     man = "urxvt -e man ",
     terminal = "urxvt ", 
     screen = "urxvt -e screen",
@@ -865,7 +865,7 @@ globalkeys = awful.util.table.join(
     end),
 
     -- Application hotkeys
-    awful.key({ modkey            }, "f", function () awful.util.spawn(env.browser) end),
+    awful.key({ modkey            }, "b", function () awful.util.spawn(env.browser) end),
     awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
     awful.key({                   }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
     awful.key({ modkey            }, "r", function () mypromptbox[mouse.screen]:run() end),
