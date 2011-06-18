@@ -50,17 +50,17 @@ function new()
 	end
 
 	local menu = {
-		{ "Accessories", programs["Utility"], utils.lookup_icon({ icon = 'applications-accessories.png' }) },
-		{ "Development", programs["Development"], utils.lookup_icon({ icon = 'applications-development.png' }) },
-		{ "Education", programs["Education"], utils.lookup_icon({ icon = 'applications-science.png' }) },
+		{ "&A Accessories", programs["Utility"], utils.lookup_icon({ icon = 'applications-accessories.png' }) },
+		{ "&D Development", programs["Development"], utils.lookup_icon({ icon = 'applications-development.png' }) },
+		{ "&U Education", programs["Education"], utils.lookup_icon({ icon = 'applications-science.png' }) },
 		{ "Games", programs["Game"], utils.lookup_icon({ icon = 'applications-games.png' }) },
-		{ "Graphics", programs["Graphics"], utils.lookup_icon({ icon = 'applications-graphics.png' }) },
-		{ "Internet", programs["Network"], utils.lookup_icon({ icon = 'applications-internet.png' }) },
-		{ "Multimedia", programs["AudioVideo"], utils.lookup_icon({ icon = 'applications-multimedia.png' }) },
-		{ "Office", programs["Office"], utils.lookup_icon({ icon = 'applications-office.png' }) },
-		{ "Other", programs["Other"], utils.lookup_icon({ icon = 'applications-other.png' }) },
+		{ "&G Graphics", programs["Graphics"], utils.lookup_icon({ icon = 'applications-graphics.png' }) },
+		{ "&I Internet", programs["Network"], utils.lookup_icon({ icon = 'applications-internet.png' }) },
+		{ "&M Multimedia", programs["AudioVideo"], utils.lookup_icon({ icon = 'applications-multimedia.png' }) },
+		{ "&C Office", programs["Office"], utils.lookup_icon({ icon = 'applications-office.png' }) },
+		{ "&H Other", programs["Other"], utils.lookup_icon({ icon = 'applications-other.png' }) },
 		{ "Settings", programs["Settings"], utils.lookup_icon({ icon = 'applications-utilities.png' }) },
-		{ "System Tools", programs["System"], utils.lookup_icon({ icon = 'applications-system.png' }) },
+		{ "&T System Tools", programs["System"], utils.lookup_icon({ icon = 'applications-system.png' }) },
 	}
 
 	-- Removing empty entries from menu

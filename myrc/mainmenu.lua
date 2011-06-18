@@ -61,17 +61,17 @@ function build()
     }
 
     local mymainmenu_items_head = {
-        { "&A Awesome", myawesomemenu, beautiful.awesome_icon },
+        { "Awesome", myawesomemenu, beautiful.awesome_icon },
         { "&E Terminal", terminal, freedesktop_utils.lookup_icon({icon = 'terminal'}) },
-        { "&M File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
-        { "&F Firefox", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
+        { "&F File Manager", fileman, freedesktop_utils.lookup_icon({icon = 'file-manager'}) },
+        { "&B Browser", browser, freedesktop_utils.lookup_icon({icon = 'browser'}) },
         { "", nil, nil}, --separator
     }
 
     local mymainmenu_items_tail = {
         { "", nil, nil}, --separator
         { "&S Syslog", syslog, freedesktop_utils.lookup_icon({ icon = "gnome-monitor"}) },
-        { "&R Rotate", {
+        { "&O Rotate", {
             {"&Normal", rotate .. " normal" , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
             {"&Left",   rotate .. " left"   , freedesktop_utils.lookup_icon({icon = 'stock_left'})},
             {"&Rigth",  rotate .. " right"  , freedesktop_utils.lookup_icon({icon = 'stock_right'})},
@@ -81,7 +81,7 @@ function build()
             {"&Block",   env.rfkill.block   , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
         }, freedesktop_utils.lookup_icon({icon = 'wicd-gtk'})},
         { "&X Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
-        { "&U Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
+        { "&R Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },
         { "", nil, nil}, --separator
         { "&P Power", myquitmenu, freedesktop_utils.lookup_icon({ icon = 'gnome-logout' }) },
     }
