@@ -77,8 +77,9 @@ function build()
             {"&Rigth",  rotate .. " right"  , freedesktop_utils.lookup_icon({icon = 'stock_right'})},
         }, freedesktop_utils.lookup_icon({icon = 'reload'})},
         { "&W Wifi", {
-            {"&Unblock", env.rfkill.unblock , freedesktop_utils.lookup_icon({icon = 'stock_up'})},
-            {"&Block",   env.rfkill.block   , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
+            {"&F Wifi", env.rfkill.wifi , freedesktop_utils.lookup_icon({icon = 'stock_up'})},
+            {"&M WiMax",   env.rfkill.wimax   , freedesktop_utils.lookup_icon({icon = 'stock_up'})},
+            {"&N None",   env.rfkill.off   , freedesktop_utils.lookup_icon({icon = 'stock_down'})},
         }, freedesktop_utils.lookup_icon({icon = 'wicd-gtk'})},
         { "&X Xkill", xkill, freedesktop_utils.lookup_icon({ icon = "weather-storm"}) },
         { "&R Run", run, freedesktop_utils.lookup_icon({ icon = "access"}) },

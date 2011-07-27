@@ -440,7 +440,10 @@ env = {
     hibernate = "sudo /usr/sbin/pm-hibernate",
     suspend = "sudo /usr/sbin/pm-suspend",
     rotate = "rotator",
-    rfkill = { block = "sudo rfkill block 0", unblock = "sudo rfkill unblock 0" },
+    rfkill = { 
+        wifi = "sudo /usr/local/bin/laptop-net wifi", 
+        wimax = "sudo /usr/local/bin/laptop-net wimax",
+        off = "sudo /usr/local/bin/laptop-net off"},
     syslog = "urxvt -e vim -T xterm-256color /var/log/messages"
 }
 
