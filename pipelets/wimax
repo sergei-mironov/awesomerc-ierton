@@ -1,0 +1,10 @@
+#!/bin/sh
+
+IFS=$'\n'
+while true ; do
+    echo
+    /usr/bin/wimaxcu status connect | grep 'Name' | awk -F : '{print $2}'
+    /usr/bin/wimaxll -i wmx0 wait-for-state-change >/dev/null 2>&1
+    sleep 1
+done
+
