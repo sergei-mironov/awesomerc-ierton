@@ -1,8 +1,11 @@
 #!/bin/sh
 
-while true ; do
-	acpitool -b | while read line ; do
+which acpitool >/dev/null || exit 1
+which acpi_listen >/dev/null || exit 1
 
+while true ; do
+
+	acpitool -b | while read line ; do
 		batnum=`echo $line |  sed 's/.*#\(.\).*/\1/'`
 		percent=`echo $line | sed 's/.*\:[^,]*, \([^,]*\).*/\1/'`
 		if echo $line | grep -q discharging ; then
@@ -13,9 +16,9 @@ while true ; do
 		fi
 
 		echo "<span color='$color'>BAT#$batnum $percent $tleft</span>"
-
 	done
 
-	sleep 180
+    # Exits after -c X ACPI events or after -t Y sec elapsed
+    acpi_listen -t 60 -c 5 >/dev/null 2>&1
 done
 
