@@ -603,6 +603,10 @@ pipelets.register_fmt( myrfkill, "rfkill", "<span color='#336633'> $1</span>")
 mywifibox = widget({ type = "textbox", align="right" })
 pipelets.register_fmt( mywifibox, "wireless", "<span color='#333366'> $1</span>")
 
+-- Wimax
+mywimaxbox = widget({ type = "textbox", align="right" })
+pipelets.register_fmt( mywimaxbox, "wimax", "<span color='#333366'> $1</span>")
+
 -- Layoutbox
 mylayoutbox = {}
 mylayoutbox.buttons = awful.util.table.join(
@@ -711,6 +715,7 @@ for s = 1, screen.count() do
         mybatbox,
         mymountbox,
         mywifibox,
+        mywimaxbox,
         layout = awful.widget.layout.horizontal.leftright
     }
 end
