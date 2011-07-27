@@ -1,0 +1,80 @@
+#!/bin/sh
+
+die() { 
+	echo $@ >&2 ; 
+	logger -t `basename $0` $@
+	exit -1; 
+}
+
+MODE=$1
+RFKILL=/usr/sbin/rfkill
+WIMAXCU=/usr/bin/wimaxcu
+DHCPCD=/sbin/dhcpcd
+
+WIFI=`$RFKILL list 2>&1 | grep -i wireless | awk -F : '{print $1}'`
+echo $WIFI
+WIMAX=`$RFKILL list 2>&1 | grep -i wimax | awk -F : '{print $1}'`
+echo $WIMAX
+
+check() {
+	for f in $@ ; do
+		which $f >/dev/null || 
+			die "$f not found"
+	done
+}
+
+rfkill_do() {
+	local what=$1
+	shift
+	for id in $@ ; do
+		$RFKILL $what $id || return $?
+	done
+}
+
+wimax_tune() {
+	local net=$1
+	local nid=`$WIMAXCU scan | sed -n '/'$net'/,/ID/ p' | grep ID | head -1 | awk -F : '{print $2}'`
+	test $nid -ge 0 || 
+		die "Unable to find $net id. Try $WIMAXCU scan."
+	$WIMAXCU connect network $nid || 
+		die "Unable to connect to $net (nid $nid). Try $WIMAXCU connect network $nid."
+}
+
+wimax_is_connected() {
+	case `$WIMAXCU status` in
+		Connected*) 
+			return 0 ;;
+		*) 
+			return 1;
+	esac
+}
+
+check $RFKILL $WIMAXCU $DHCPCD
+
+case $MODE in
+	wifi)
+		$DHCPCD -k wmx0 2>&1 >/dev/null
+		{ rfkill_do block $WIMAX && rfkill_do unblock $WIFI ; } ||
+			die "Swithcing to $MODE mode failed"
+		;;
+	wimax)
+		$DHCPCD -k wmx0 2>&1 >/dev/null
+		wimax_is_connected && die "Wimax already connected"
+		{ rfkill_do block $WIFI && rfkill_do unblock $WIMAX ; } ||
+			die "Swithcing to $MODE mode failed"
+		wimax_tune "COMSTAR" || 
+			die "Unable to connect to COMSTAR"
+		$DHCPCD wmx0 || 
+			die "Unable to launch $DHCPCD wmx0"
+		;;
+	off)
+		$DHCPCD -k wmx0 2>&1 >/dev/null
+		{ rfkill_do block $WIFI && rfkill_do block $WIMAX ; } ||
+			die "Swithcing to $MODE mode failed"
+		;;
+	*)
+		die "Invalid mode"
+		;;
+esac
+
+logger -t `basename $0` Switched to $MODE
