@@ -27,13 +27,14 @@ awesomize() {
 	local sname=`basename "$1"`
 	echo "Will use '$sname' as callback key for $1" >&2
 	while read l ; do
-		echo "$FNAME ( \"$sname\" , \"$l\" )"
+		echo "$FNAME ( \"$sname\" , \"$l\" )" | awesome-client
 	done
 }
 
 cleanup() {
-	for pid in $pids ; do 
-		pkill -P $pid 2>/dev/null
+	for pidfile in `ls -1 $HOME/.pipeman:$DISPLAY.*.ppid` ; do 
+		pkill -P `cat $pidfile` 2>/dev/null
+        rm $pidfile
 	done
 }
 
@@ -49,15 +50,17 @@ check_prog() {
 
 check_prog pkill
 check_prog awesome-client
-check_pid
 
-test "$KILL" = "y" && { cleanup; exit 0; }
+cleanup
+test "$KILL" = "y" && { exit 0; }
 
 trap cleanup "EXIT"
 for s in `find "$SDIR" -type f -and -executable` ; do
 	echo "Starting $s"
-	{ $s | awesomize "$s" | awesome-client ; } &
-	pids="$pids $!"
+	{ $s | awesomize "$s" ; } &
+    pid=$!
+    echo $pid > $HOME/.pipeman:$DISPLAY.`basename $s`.ppid
+    pids="$pids $pid"
 done
 
 test -z "$pids" && die "Nothing to wait for"
