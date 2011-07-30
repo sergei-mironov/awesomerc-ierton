@@ -1,6 +1,10 @@
 #!/bin/sh
 
 IFS=$'\n'
+
+which /usr/bin/wimaxcu 2>/dev/null || exit -1
+which /usr/bin/wimaxll 2>/dev/null || exit -1
+
 while true ; do
     echo
     /usr/bin/wimaxcu status connect | grep 'Name' | awk -F : '{print $2}'
