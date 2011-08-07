@@ -6,6 +6,27 @@ die() {
 	exit 1
 }
 
+check_prog() {
+	which "$1" >/dev/null 2>&1 || die "Please install $1"
+}
+
+# Generates proper function call for every input line
+awesomize() {
+	local sname=`basename "$1"`
+	echo "Will use '$sname' as callback key for $1" >&2
+	while read l ; do
+		echo "$FNAME ( \"$sname\" , \"$l\" )" | awesome-client
+	done
+}
+
+# Kills all processes having .*ppid file
+cleanup() {
+	for pidfile in `ls -1 $HOME/.pipeman:$DISPLAY.*.ppid` ; do 
+		pkill -P `cat $pidfile` 2>/dev/null
+        rm $pidfile
+	done
+}
+
 while test -n "$1" ; do
     case $1 in
         -k|--kill)
@@ -22,37 +43,11 @@ done
 FNAME=pipelets.update
 test -n "$FNAME" || die "FNAME should be non-empty"
 
-# Will generate function call for every input line
-awesomize() {
-	local sname=`basename "$1"`
-	echo "Will use '$sname' as callback key for $1" >&2
-	while read l ; do
-		echo "$FNAME ( \"$sname\" , \"$l\" )" | awesome-client
-	done
-}
-
-cleanup() {
-	for pidfile in `ls -1 $HOME/.pipeman:$DISPLAY.*.ppid` ; do 
-		pkill -P `cat $pidfile` 2>/dev/null
-        rm $pidfile
-	done
-}
-
-check_pid() {
-	local pidfile="$HOME/.pipeman:$DISPLAY.pid"
-	test -f "$pidfile" && kill `cat $pidfile`
-	echo $$ > "$pidfile"
-}
-
-check_prog() {
-	which "$1" >/dev/null 2>&1 || die "Please install $1"
-}
-
 check_prog pkill
 check_prog awesome-client
 
 cleanup
-test "$KILL" = "y" && { exit 0; }
+test "$KILL" = "y" && exit 0
 
 trap cleanup "EXIT"
 for s in `find "$SDIR" -type f -and -executable` ; do

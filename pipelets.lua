@@ -18,7 +18,6 @@ module("pipelets")
 
 -- Pipelets configuration
 config = {
-	script_path = "/usr/share/awesome/pipelets/",
 	format_string = "$1",
 	separator = nil,
 	widget_field = "text",
@@ -26,14 +25,6 @@ config = {
 
 -- # Utility functions
 local util = {}
-
-function util.fullpath(script)
-	if string.find(script, '^/') == nil then
-		script = config.script_path .. script
-	end
-
-	return script
-end
 
 --- Split string by separator into table
 -- @param str String to split
@@ -44,7 +35,8 @@ function util.split(str, sep)
 	end
 	local parts = {} --parts array
 	local first = 1
-	local ostart, oend = string.find(str, sep, first, true) --regexp disabled search
+    -- regexp disabled search
+	local ostart, oend = string.find(str, sep, first, true) 
 
 	while ostart do
 		local part = string.sub(str, first, ostart - 1)
@@ -64,10 +56,13 @@ end
 -- @param format Format string
 -- @param sep Separator of values in string
 function util.format(parts, format, sep)
-	-- For each part with number "k" replace corresponding "$k" variable in format string
+	-- For each part with number "k" replace corresponding 
+    -- "$k" variable in format string
 	for k,part in pairs(parts) do
-		local part = string.gsub(part, "%%", "%1%1") --percent fix for next gsub (bug found in Wicked)
-		part = awful.util.escape(part) --escape XML entities for correct Pango markup
+        --percent fix for next gsub (bug found in Wicked)
+		local part = string.gsub(part, "%%", "%1%1") 
+        --escape XML entities for correct Pango markup
+		part = awful.util.escape(part)
 		format = string.gsub(format, "$" .. k, part)
 	end
 
@@ -88,12 +83,16 @@ end
 
 -- # Acting functions
 function init()
-	awful.util.spawn(awful.util.getdir("config").."/pipeman "..config.script_path, false)
+	awful.util.spawn(
+        awful.util.getdir("config")
+        .. "/pipeman "
+        .. config.script_path, false)
 end
 
 local pipelets = {}
 
---- Function for external callbacks
+--- Function for external callbacks. pipeman script 
+-- calls this function via awesome-client
 function update(script_name, string)
 	local f = pipelets[script_name]
 	if f == nil then return end
