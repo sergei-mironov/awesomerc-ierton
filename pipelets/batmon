@@ -4,21 +4,22 @@ which acpitool >/dev/null || exit 1
 which acpi_listen >/dev/null || exit 1
 
 while true ; do
+    # Lookup first battery's status
+	line=`acpitool -b | head -n 1`
+    batnum=`echo "$line" |  sed 's/.*#\(.\).*/\1/'`
+    percent=`echo "$line" | sed 's/.*\:[^,]*, \([^,]*\).*/\1/'`
+    if echo "$line" | grep -q discharging ; then
+        color='#662222'
+        tleft=`echo "$line" | sed 's/.*\:[^,]*, [^,]*, \(..:..\).*/\1/'`
+    else
+        color='#226622'
+        tleft=''
+    fi
 
-	acpitool -b | while read line ; do
-		batnum=`echo $line |  sed 's/.*#\(.\).*/\1/'`
-		percent=`echo $line | sed 's/.*\:[^,]*, \([^,]*\).*/\1/'`
-		if echo $line | grep -q discharging ; then
-			color='#662222'
-			tleft=`echo $line | sed 's/.*\:[^,]*, [^,]*, \(..:..\).*/\1/'`
-		else
-			color='#226622'
-		fi
-
-		echo "<span color='$color'>BAT#$batnum $percent $tleft</span>"
-	done
+    echo "<span color='$color'>BAT#$batnum $percent $tleft</span>"
 
     # Exits after -c X ACPI events or after -t Y sec elapsed
-    acpi_listen -t 60 -c 5 >/dev/null 2>&1
+    acpi_listen -t 60 -c 1 >/dev/null 2>&1
+    sleep 2
 done
 
