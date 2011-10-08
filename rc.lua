@@ -418,17 +418,18 @@ end--}}}
 -- Default modkey.
 modkey = "Mod4"
 altkey = "Mod1"
+urxvt = awful.util.getdir("config") .. "/urxvt-launcher"
 
 -- Environment programs
 env = {
     browser = "chromium ",
-    man = "urxvt -e man ",
-    terminal = "urxvtc ", 
-    screen = "urxvtc -e screen",
+    man = urxvt .. " -e man ",
+    terminal = urxvt,
+    screen = urxvt .. " -e screen",
     fileman = "nautilus",
-    terminal_root = "urxvtc -e su -c screen",
+    terminal_root = urxvt .. " -e su -c screen",
     im = "pidgin ",
-    editor = os.getenv("EDITOR") or "urxvtc -e vim ",
+    editor = os.getenv("EDITOR") or (urxvt .. " -e vim "),
     home_dir = os.getenv("HOME"),
     music_show = "gmpc --replace",
     music_hide = "gmpc --quit",
@@ -444,7 +445,7 @@ env = {
         wifi = "sudo /usr/local/bin/laptop-net wifi", 
         wimax = "sudo /usr/local/bin/laptop-net wimax",
         off = "sudo /usr/local/bin/laptop-net off"},
-    syslog = "urxvt -e vim -T xterm-256color /var/log/messages"
+    syslog = urxvt .. " -e vim -T xterm-256color /var/log/messages"
 }
 
 -- Pipelets
