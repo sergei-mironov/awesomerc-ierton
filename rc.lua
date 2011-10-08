@@ -874,7 +874,7 @@ globalkeys = awful.util.table.join(
 
     -- Application hotkeys
     awful.key({ modkey            }, "b", function () awful.util.spawn(env.browser) end),
-    awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen)  end),
+    awful.key({ modkey            }, "e", function () awful.util.spawn(env.screen, false)  end),
     awful.key({                   }, "Scroll_Lock", function () awful.util.spawn(env.locker) end),
     awful.key({ modkey            }, "r", function () mypromptbox[mouse.screen]:run() end),
     awful.key({ modkey,           }, "m", function () run_or_raise("gmpc", { class = "Gmpc" }) end),
