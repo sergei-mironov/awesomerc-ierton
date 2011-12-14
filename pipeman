@@ -16,6 +16,7 @@ awesomize() {
 	echo "Will use '$sname' as callback key for $1" >&2
 	while read l ; do
 		echo "$FNAME ( \"$sname\" , \"$l\" )" | awesome-client
+		pgrep awesome>/dev/null 2>&1 || break
 	done
 }
 
